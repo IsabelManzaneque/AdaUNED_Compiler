@@ -35,9 +35,15 @@ import es.uned.lsi.compiler.lexical.LexicalErrorManager;
 
 ESPACIO_BLANCO=[ \t\r\n\f]
 fin = "fin"{ESPACIO_BLANCO}
-CHARACTER=[a-zA-Z]
-DIGIT=[0-9]
-COMMENT=("--")
+
+LETTER = [a-zA-Z]
+STRING = \"[^\"]*\"                  // si quito ^ no incluye las "" en el id
+DIGIT = [0-9]
+INT = {DIGIT}+                       // un entero es un digito seguido o no por mas
+ID = ({LETTER}({LETTER}|{DIGIT})*)   // una letra seguida de 0 o mas letras/numeros
+
+
+//COMENTARIO=("--")
 
 %%
 
@@ -46,7 +52,62 @@ COMMENT=("--")
 
      // DELIMITADORES
      
-     
+     "“"                {  
+                           Token token = new Token (sym.DOUBLEQ);   
+                           token.setLine (yyline + 1);           
+                           token.setColumn (yycolumn + 1);       
+                           token.setLexema (yytext ());          
+           			       return token;                         
+                        }
+                        
+     "("                {  
+                           Token token = new Token (sym.LEFTBRACKET);  
+                           token.setLine (yyline + 1);           
+                           token.setColumn (yycolumn + 1);       
+                           token.setLexema (yytext ());          
+           			       return token;                         
+                        }
+                        
+     ")"                {  
+                           Token token = new Token (sym.RIGHTBRACKET);  
+                           token.setLine (yyline + 1);           
+                           token.setColumn (yycolumn + 1);       
+                           token.setLexema (yytext ());          
+           			       return token;                         
+                        }
+                        
+     "--"               {  
+                           Token token = new Token (sym.COMMENT);  
+                           token.setLine (yyline + 1);           
+                           token.setColumn (yycolumn + 1);       
+                           token.setLexema (yytext ());          
+           			       return token;                         
+                        }
+                        
+     ","                {     
+                           Token token = new Token (sym.COMMA);  
+                           token.setLine (yyline + 1);           
+                           token.setColumn (yycolumn + 1);       
+                           token.setLexema (yytext ());          
+           			       return token;                         
+                        }
+                        
+     ";"                {  
+                           Token token = new Token (sym.SEMICOLON);  
+                           token.setLine (yyline + 1);           
+                           token.setColumn (yycolumn + 1);       
+                           token.setLexema (yytext ());          
+           			       return token;                         
+                        }
+                        
+     ":"                {  
+                           Token token = new Token (sym.COLON);  
+                           token.setLine (yyline + 1);           
+                           token.setColumn (yycolumn + 1);       
+                           token.setLexema (yytext ());          
+           			       return token;                         
+                        }
+                       
      // OPERADORES ARITMETICOS
      
      "+"                {  
@@ -107,6 +168,14 @@ COMMENT=("--")
                      
      ":="               {  
                            Token token = new Token (sym.ASIGN);
+                           token.setLine (yyline + 1);
+                           token.setColumn (yycolumn + 1);
+                           token.setLexema (yytext ());
+           			       return token;
+                        }
+                        
+     "."                {  
+                           Token token = new Token (sym.ACCESS);
                            token.setLine (yyline + 1);
                            token.setColumn (yycolumn + 1);
                            token.setLexema (yytext ());
@@ -204,7 +273,7 @@ COMMENT=("--")
                            return token;                           
                         }  
                         
-     "loop"               { 
+     "loop"             { 
                            Token token = new Token (sym.LOOP);  
                            token.setLine (yyline + 1); 
                            token.setColumn (yycolumn + 1); 
@@ -212,7 +281,7 @@ COMMENT=("--")
                            return token;                           
                         }  
                         
-     "out"               { 
+     "out"              { 
                            Token token = new Token (sym.OUT);  
                            token.setLine (yyline + 1); 
                            token.setColumn (yycolumn + 1); 
@@ -283,22 +352,43 @@ COMMENT=("--")
                            token.setLexema (yytext ());
            			       return token;
 			            }  
-			            
+			           
+      // PATRONES      
                         
     
-    // incluir aqui el resto de las reglas patron - accion
- 
+      // incluir aqui el resto de las reglas patron - accion
+ 	 
+     {ID}               {  
+	                       Token token = new Token (sym.ID);
+	                       token.setLine (yyline + 1);
+	                       token.setColumn (yycolumn + 1);
+	                       token.setLexema (yytext ());
+	           	           return token;
+	                    }
+	                    
+	 {STRING}	        {  
+	                       Token token = new Token (sym.STRING);
+	                       token.setLine (yyline + 1);
+	                       token.setColumn (yycolumn + 1);
+	                       token.setLexema (yytext ());
+	            	       return token;
+                        }
+                        
+     {INT}              {  			   
+	 		               Token token = new Token (sym.INTEGER);
+	                       token.setLine (yyline + 1);
+                           token.setColumn (yycolumn + 1);
+                           token.setLexema (yytext ());
+           	               return token;
+            	        }
 
-   {ESPACIO_BLANCO}	{}
+     {ESPACIO_BLANCO}	{}
 
-{fin} {}
+     {fin} {}
     
     // error en caso de coincidir con ningún patrón
-    // I - Este patron controla los errores lexicos. Aquellos simbolos que se encuentren en el fichero fuente
-    // I - que no correspondan con ningun patron declarado seran tratados como errores y lanzara lexicalError
-    // I - que generara las salidas de error lexical error
-    
-	[^]     
+     
+     [^]     
                         {                                               
                            LexicalError error = new LexicalError ();
                            error.setLine (yyline + 1);

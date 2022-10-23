@@ -53,6 +53,14 @@ parser code {:
 // Declaracion de terminales (Ejemplo)
 
 // DELIMITADORES
+terminal Token DOUBLEQ;
+terminal Token LEFTBRACKET;
+terminal Token RIGHTBRACKET;
+terminal Token COMMENT;
+terminal Token COMMA;
+terminal Token SEMICOLON;
+terminal Token COLON;
+
 
 // OPERADORES ARITMETICOS
 terminal Token PLUS;
@@ -63,6 +71,7 @@ terminal Token GREATERTHAN;
 terminal Token LESSTHAN;
 terminal Token NOTEQUAL;
 terminal Token ASIGN;
+terminal Token ACCESS;
 
 
 // PALABRAS RESERVADAS
@@ -89,6 +98,10 @@ terminal Token TYPE;
 terminal Token WHILE;
 
 
+// PATRONES
+terminal Token ID;
+terminal Token STRING;
+terminal Token INT;
 
 // Declaracion de no terminales. No modificar los propuestos
 

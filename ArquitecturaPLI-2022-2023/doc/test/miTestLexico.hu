@@ -1,0 +1,59 @@
+-- los errores léxicos están relacionados con el reconocimiento de caracteres no permitidos en los 
+-- identificadores (ñ, ç, caracteres acentuados, etc.) y el mal balanceado de las cadenas de caracteres, 
+-- por la emisión o abuso, de algún carácter comillas.
+
+-- COMENTARIOS:
+-- comentario simple
+-- "comentario entre comillas"
+-- 2453 comentario con numeros 286184
+"un comentario tras una cadena" -- este es el comentario
+
+
+-- IDENTIFICADORES:
+identifi1
+identi223fi
+identifyyyy
+identifi!!@    
+1identify
+iden!tify66lok
+iden!ti&&&&&fy66lok
+998identifi
+88identifo88
+1!identify
+!!2identify
+1&&2identify
+!identify
+@identify
+identiíííí      
+!!765££
+£%%@@!
+£%aaaaaaaa%@@!
+
+ando' 
+x := miIdentificador7534
+
+
+-- CADENAS:
+"cadena"
+"Esta es una cadena"
+"mi                       33      cadena"
+"cadena con terminacion doble""
+"!!!numero especiales!!!££%^^^ áéííóóóó"
+"cadena con salto de linea"
+
+
+-- NUMEROS:
+7
+98465
+-7
++7
+8 + 8
+8+8
+9 - 9
+9-9
+
+x := 5
+x := 5*5
+x := -6 - 6
+
+

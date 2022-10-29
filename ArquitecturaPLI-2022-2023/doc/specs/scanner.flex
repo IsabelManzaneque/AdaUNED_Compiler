@@ -26,7 +26,8 @@ import es.uned.lsi.compiler.lexical.LexicalErrorManager;
 %scanerror LexicalError
 
 // incluir aqui, si es necesario otras directivas
-
+%full
+%ignorecase
 %{
   LexicalErrorManager lexicalErrorManager = new LexicalErrorManager ();
   private int commentCount = 0;
@@ -36,14 +37,17 @@ import es.uned.lsi.compiler.lexical.LexicalErrorManager;
 ESPACIO_BLANCO=[ \t\r\n\f]
 fin = "fin"{ESPACIO_BLANCO}
 
-LETTER = [a-zA-Z]
-STRING = \"[^\"]*\"                  // si quito ^ no incluye las "" en el id
-DIGIT = [0-9]
-INT = {DIGIT}+                       // un entero es un digito seguido o no por mas
-ID = ({LETTER}({LETTER}|{DIGIT})*)   // una letra seguida de 0 o mas letras/numeros
+LETTER      = [a-zA-Z]
+ESP_CHAR    = [£$?!&%@αινσϊρη]
+STRING      = \".*\"                         
+DIGIT       = [0-9]
+INT         = {DIGIT}+                          
+ID          = ({LETTER}({LETTER}|{DIGIT})*)                                       
+WRONG_ID    = (({INT}|{ESP_CHAR})+({ID}|{INT}|{ESP_CHAR})*) | ({ID}{ESP_CHAR}+({ID}|{INT}|{ESP_CHAR})*)   
+//SINGLE      =       
+SALTO_LINEA =[\r\n]
+COMMENT     = "--" ~{SALTO_LINEA}               
 
-
-//COMENTARIO=("--")
 
 %%
 
@@ -381,6 +385,19 @@ ID = ({LETTER}({LETTER}|{DIGIT})*)   // una letra seguida de 0 o mas letras/nume
                            token.setLexema (yytext ());
            	               return token;
             	        }
+            	      
+          
+	 {WRONG_ID}         {                                               
+	                       LexicalError error = new LexicalError ();
+                           error.setLine (yyline + 1);
+	                       error.setColumn (yycolumn + 1);
+	                       error.setLexema (yytext ());
+	                       lexicalErrorManager.lexicalError ("ERROR: "+error+", ID = "+yytext()+", Identificador no valido");
+	                    }
+     
+     {COMMENT}          {}		   
+	
+       
 
      {ESPACIO_BLANCO}	{}
 

@@ -405,14 +405,16 @@ COMMENT     = "--" ~{SALTO_LINEA}
     
     // error en caso de coincidir con ningún patrón
      
-     [^]     
-                        {                                               
+     [^]               {                                               
                            LexicalError error = new LexicalError ();
                            error.setLine (yyline + 1);
                            error.setColumn (yycolumn + 1);
                            error.setLexema (yytext ());
                            lexicalErrorManager.lexicalError (error);
+                           //lexicalErrorManager.lexicalFatalError("Error en la linea [" + error.getLine() + ":" + error.getColumn() + "] Caracter no esperado: " + error.getLexema());
+                           //lexicalErrorManager.lexicalError ("Token no valido: "+yytext()+" ERROR: "+error);
                         }
+     	
     
 }
 

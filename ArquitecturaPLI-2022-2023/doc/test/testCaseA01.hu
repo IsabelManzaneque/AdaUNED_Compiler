@@ -1,7 +1,8 @@
 -- programa vacio
 
 procedure testCase01 () is
-
+	
+	
 	type Tpersona is record
 		dni: Integer;
 		edad : Integer;
@@ -22,6 +23,12 @@ procedure testCase01 () is
 	x : Integer;
 	
 	esMayor : Boolean;
+	
+	x,y : Integer;
+	
+	a : Boolean;
+	
+	p1,p2: Tpersona;
 	
 begin
 

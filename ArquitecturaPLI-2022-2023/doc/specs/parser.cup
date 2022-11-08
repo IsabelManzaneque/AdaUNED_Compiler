@@ -119,16 +119,13 @@ non terminal tipoConstanteSimbolica;
 non terminal constanteSimbolica;
 non terminal constantesSimbolicas;
 
-non terminal opcionTipo;
-non terminal tipoEstructurado;
-non terminal cabaceraTipoEstructurado;
-non terminal campoTipoEstructurado;
-non terminal camposTipoEstructurado;
-non terminal finTipoEstructurado;
 non terminal tipoGlobal;
 non terminal tiposGlobales;
 
+non terminal tipoVariable;
+non terminal idMultiple;
 non terminal variableSimple;
+non terminal variablesSimples;
 non terminal variableGlobal;
 non terminal variablesGlobales;
 non terminal subprogramas;
@@ -136,6 +133,7 @@ non terminal subprogramas;
 
 // la ultima precedencia declarada es la que mas prioridad tiene, la primera la que menos
 // Declaracion de relaciones de precedencia
+precedence left     ID;
 precedence left     AND; 
 precedence left     NOTEQUAL;
 precedence left     GREATERTHAN;
@@ -216,22 +214,32 @@ cabecera ::= PROCEDURE error{:syntaxErrorManager.syntaxInfo("Especifique un nomb
                       | {:syntaxErrorManager.syntaxInfo("Se esperaba un identificador"); errorCounter ++;:} COLON CONSTANT ASIGN tipoConstanteSimbolica SEMICOLON;
                       
                       
-  	       
- // Reglas de produccion de los tipos globales
  
- variableSimple ::= ID COLON INTEGER SEMICOLON | ID COLON BOOLEAN SEMICOLON | ID COLON ID SEMICOLON;
- 
- tiposGlobales ::= tiposGlobales tipoGlobal | tipoGlobal;
- 
- tipoGlobal ::= TYPE ID IS RECORD camposTipoEstructurado END RECORD SEMICOLON;
- 
- camposTipoEstructurado ::= camposTipoEstructurado variableSimple | variableSimple;
- 
-  
-  
- // Reglas de produccion de variables
+  // Reglas de produccion de variables globales
+   	       
+ tipoVariable ::= INTEGER | BOOLEAN | ID;
+ idMultiple ::=  ID COMMA idMultiple | ID;
  
  variablesGlobales ::= variablesGlobales variableGlobal | variableGlobal;
+ variableGlobal ::= idMultiple COLON tipoVariable SEMICOLON;
+ 
+ // Reglas de produccion de los tipos globales
+ 
+ tiposGlobales ::= tiposGlobales tipoGlobal | tipoGlobal; 
+ tipoGlobal ::= TYPE ID IS RECORD variablesSimples END RECORD SEMICOLON;                     
+ variablesSimples ::= variablesSimples variableSimple | variableSimple; 
+ variableSimple ::= ID COLON tipoVariable SEMICOLON;
+ 
+ 
+ 
+  
+  
+
+
+ 
+
+ 
+
  
  
  

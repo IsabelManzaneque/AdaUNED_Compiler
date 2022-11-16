@@ -51,7 +51,7 @@ parser code {:
 	}
 :}
 
-// Declaracion de terminales (Ejemplo)
+// Declaracion de terminales ------------------------------------------------
 
 // DELIMITADORES
 terminal Token DOUBLEQ;
@@ -98,51 +98,62 @@ terminal Token TRUE;
 terminal Token TYPE;
 terminal Token WHILE;
 
-
 // PATRONES
 terminal Token ID;
 terminal Token STRING;
 terminal Token INT;
 
-// Declaracion de no terminales. No modificar los propuestos
+// Declaracion de no terminales ------------------------------------------------
 
 non terminal  			program;
 non terminal Axiom		axiom;
 
 non terminal cabecera;
 non terminal cuerpo;
-non terminal bloque;
 non terminal declaraciones;
-non terminal sentencias;
 
-non terminal tipoConstanteSimbolica;
+non terminal sentencia;
+non terminal sentencias;
+non terminal sentenciaES;
+non terminal sentenciaAsign;
+non terminal sentenciaIf;
+non terminal sentenciaReturn;
+non terminal sentenciaWhile;
+
+non terminal tipo;
+non terminal tipos;
+non terminal tipoEstructurado;
+non terminal tipoPrimitivo;
+non terminal tipoVariable;
+non terminal tipoConstante;
+
 non terminal constanteSimbolica;
 non terminal constantesSimbolicas;
 
-non terminal tipoGlobal;
-non terminal tiposGlobales;
+non terminal expresion;
+non terminal variable;
+non terminal variables;
 
-non terminal tipoVariable;
-non terminal idMultiple;
-non terminal variableSimple;
-non terminal variablesSimples;
-non terminal variableGlobal;
-non terminal variablesGlobales;
+non terminal parametrosSubprograma;
+non terminal parametroSubprograma;
+non terminal subprograma;
 non terminal subprogramas;
+non terminal funcion;
+non terminal procedimiento;
+non terminal parametro;
 
+// Declaracion de relaciones de precedencia ------------------------------------------------
 
-// la ultima precedencia declarada es la que mas prioridad tiene, la primera la que menos
-// Declaracion de relaciones de precedencia
-precedence left     ID;
 precedence left     AND; 
 precedence left     NOTEQUAL;
+precedence left     LESSTHAN;
 precedence left     GREATERTHAN;
 precedence left     MINUS;
 precedence left     MULT;
-precedence left     ACCESS, LEFTBRACKET, RIGHTBRACKET; // estos se supone que tienen la misma precedencia. juntos o separados?
+precedence left     ACCESS, LEFTBRACKET, RIGHTBRACKET; 
 
 
-// Declaración de reglas de produccion
+// Declaración de reglas de produccion -----------------------------------------------------
 
 
 start with program;
@@ -156,88 +167,141 @@ program ::=
   		if(errorCounter != 0) syntaxErrorManager.syntaxInfo ("Numero de errores: " + errorCounter);
   		syntaxErrorManager.syntaxInfo ("Parsing process ended.");
    :};
-
-
-// INICIO DEL PROGRAMA
-
-axiom ::= cabecera cuerpo;
-
-// Reglas de produccion de cabecera
-
-cabecera ::= PROCEDURE ID LEFTBRACKET RIGHTBRACKET IS;
-cabecera ::= PROCEDURE error{:syntaxErrorManager.syntaxInfo("Especifique un nombre de programa"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET IS
-           | PROCEDURE ID error{:syntaxErrorManager.syntaxInfo("Se esperaba ("); errorCounter ++;:} RIGHTBRACKET IS
-           | PROCEDURE ID LEFTBRACKET error{:syntaxErrorManager.syntaxInfo("Se esperaba )"); errorCounter ++;:} IS
-           | PROCEDURE ID LEFTBRACKET RIGHTBRACKET error{:syntaxErrorManager.syntaxInfo("Se esperaba IS"); errorCounter ++;:};
    
-           
-// Reglas de produccion del cuerpo
- 
- cuerpo ::= declaraciones BEGIN sentencias END ID SEMICOLON
- 		  | BEGIN sentencias END ID SEMICOLON
- 		  | declaraciones BEGIN END ID SEMICOLON
- 		  | BEGIN END ID SEMICOLON;
- cuerpo ::= declaraciones BEGIN sentencias error{:syntaxErrorManager.syntaxInfo("Se esperaba END"); errorCounter ++;:} ID SEMICOLON
-          | declaraciones BEGIN sentencias END error{:syntaxErrorManager.syntaxInfo("Se esperaba un identificador"); errorCounter ++;:} SEMICOLON
-          | declaraciones BEGIN sentencias END ID error{:syntaxErrorManager.syntaxInfo("Se esperaba ;"); errorCounter ++;:};
-          
- 
- 
- // Reglas de produccion de las declaraciones
+   
 
- declaraciones ::= constantesSimbolicas tiposGlobales variablesGlobales subprogramas 
- 				 | constantesSimbolicas variablesGlobales subprogramas 
- 				 | constantesSimbolicas tiposGlobales subprogramas
- 				 | constantesSimbolicas tiposGlobales variablesGlobales
-                 | constantesSimbolicas tiposGlobales
-           		 | constantesSimbolicas variablesGlobales
+////////////////////////////////////////////////////////
+//                                                    //
+//               GRAMATICA DEL LENGUAJE               //                    
+//                                                    //
+////////////////////////////////////////////////////////
+
+// Estructura del programa -----------------------------------------------------------
+
+axiom          ::= cabecera cuerpo;
+
+cabecera       ::= PROCEDURE ID LEFTBRACKET RIGHTBRACKET IS;
+
+cuerpo         ::= declaraciones BEGIN sentencias END ID SEMICOLON
+ 		         | BEGIN sentencias END ID SEMICOLON
+ 		         | declaraciones BEGIN END ID SEMICOLON
+ 		         | BEGIN END ID SEMICOLON;
+ 		         
+declaraciones  ::= constantesSimbolicas tipos variables subprogramas 
+ 				 | constantesSimbolicas variables subprogramas 
+ 				 | constantesSimbolicas tipos subprogramas
+ 				 | constantesSimbolicas tipos variables
+                 | constantesSimbolicas tipos
+           		 | constantesSimbolicas variables
            		 | constantesSimbolicas subprogramas
-           		 | tiposGlobales variablesGlobales
-           		 | tiposGlobales subprogramas
-           		 | variablesGlobales subprogramas
+           		 | tipos variables
+           		 | tipos subprogramas
+           		 | variables subprogramas
            		 | constantesSimbolicas 
-           		 | tiposGlobales 
-           		 | variablesGlobales
+           		 | tipos
+           		 | variables
            		 | subprogramas;
-           	
- // Reglas de produccion de las constantes simbolicas
- 
- constantesSimbolicas ::= constantesSimbolicas constanteSimbolica | constanteSimbolica;
- 
- tipoConstanteSimbolica ::= TRUE | FALSE | INTEGER;
- 
- constanteSimbolica ::= ID COLON CONSTANT ASIGN tipoConstanteSimbolica SEMICOLON
-                      | ID COLON CONSTANT ASIGN tipoConstanteSimbolica {:syntaxErrorManager.syntaxInfo("Se esperaba ;"); errorCounter ++;:}
-                      | ID COLON CONSTANT ASIGN {:syntaxErrorManager.syntaxInfo("Se esperaba un valor entero / logico"); errorCounter ++;:} SEMICOLON
-                      | ID COLON {:syntaxErrorManager.syntaxInfo("falta palabra reservada constant"); errorCounter ++;:} tipoConstanteSimbolica SEMICOLON
-                      | ID {:syntaxErrorManager.syntaxInfo("Se esperaba :"); errorCounter ++;:} CONSTANT ASIGN tipoConstanteSimbolica SEMICOLON
-                      | {:syntaxErrorManager.syntaxInfo("Se esperaba un identificador"); errorCounter ++;:} COLON CONSTANT ASIGN tipoConstanteSimbolica SEMICOLON;
-                      
-                      
- 
-  // Reglas de produccion de variables globales
-   	       
- tipoVariable ::= INTEGER | BOOLEAN | ID;
- idMultiple ::=  ID COMMA idMultiple | ID;
- 
- variablesGlobales ::= variablesGlobales variableGlobal | variableGlobal;
- variableGlobal ::= idMultiple COLON tipoVariable SEMICOLON;
- 
- // Reglas de produccion de los tipos globales
- 
- tiposGlobales ::= tiposGlobales tipoGlobal | tipoGlobal; 
- tipoGlobal ::= TYPE ID IS RECORD variablesSimples END RECORD SEMICOLON;                     
- variablesSimples ::= variablesSimples variableSimple | variableSimple; 
- variableSimple ::= ID COLON tipoVariable SEMICOLON;
- 
- 
- 
+           		 
+
+// Declaracion de tipos ---------------------------------------------------------------
+
+tipoConstante    ::= TRUE | FALSE | INTEGER;
+
+tipoVariable     ::= tipoPrimitivo | ID;
+
+tipos            ::= tipos tipo | tipo;
+
+tipo             ::= tipoPrimitivo | tipoEstructurado;
+
+tipoEstructurado ::= TYPE ID IS RECORD variables END RECORD SEMICOLON; 
+
+tipoPrimitivo    ::= INTEGER | BOOLEAN;
+
+
+// Declaracion de expresiones ---------------------------------------------------------
+
+//expresiones    ::= expresiones expresion | expresion;
+
+expresion        ::= expresion MINUS expresion
+				//   | expresion PLUS expresion los que no tienen precedencia izq dan problemas
+				//   | expresion MULT expresion
+				//   | expresion DIV expresion
+				   | expresion GREATERTHAN expresion
+				   | expresion LESSTHAN expresion
+				   | expresion NOTEQUAL expresion
+				   | expresion AND expresion
+				   | LEFTBRACKET expresion RIGHTBRACKET
+				   | ID LEFTBRACKET expresion RIGHTBRACKET
+				   | ID COMMA expresion
+			       | ID       
+				   | INTEGER
+				   | TRUE
+				   | FALSE;
+				   
+
+// Declaracion de sentencias ----------------------------------------------------------
+
+sentencias       ::= sentencia SEMICOLON | sentencias sentencia SEMICOLON;
+
+sentencia        ::= sentenciaES
+                   | sentenciaAsign
+                   | sentenciaIf
+                   | sentenciaReturn
+				   | sentenciaWhile;
+
+sentenciaES      ::= PUT_LINE LEFTBRACKET parametro RIGHTBRACKET;
+
+sentenciaAsign   ::= ID ASIGN expresion;
+
+sentenciaIf      ::= IF expresion THEN sentencias END IF | IF expresion THEN sentencias ELSE sentencias END IF;
+
+sentenciaReturn  ::= RETURN expresion;
+
+sentenciaWhile   ::= WHILE expresion LOOP sentencias END LOOP;
+
+parametro        ::= expresion | STRING;
+
+
+// Declaracion de constantes ----------------------------------------------------------
+
+constantesSimbolicas ::= constantesSimbolicas constanteSimbolica | constanteSimbolica;
+
+constanteSimbolica   ::= ID COLON CONSTANT ASIGN tipoConstante SEMICOLON;
+
+
+// Declaracion de variables -----------------------------------------------------------
+
+variables       ::= variables variable | variable; 
+
+variable        ::= ID COLON tipoVariable SEMICOLON | ID COMMA variable;
+
+
+// Declaracion de subprogramas --------------------------------------------------------
+
+subprogramas    ::= subprogramas subprograma | subprograma;
+
+subprograma     ::= funcion | procedimiento;
+
+funcion         ::= FUNCTION ID LEFTBRACKET parametrosSubprograma RIGHTBRACKET RETURN tipoPrimitivo IS cuerpo;
+
+procedimiento   ::= PROCEDURE ID LEFTBRACKET parametrosSubprograma RIGHTBRACKET IS cuerpo;
+
+parametrosSubprograma  ::= parametrosSubprograma parametroSubprograma | parametroSubprograma;
+
+parametroSubprograma   ::= ID COLON OUT tipo | ID COMMA parametroSubprograma;
+
+
+
+
+
+
+
+
   
   
 
-
+           		 
  
-
  
 
  

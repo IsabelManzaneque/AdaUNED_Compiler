@@ -216,8 +216,6 @@ tipoPrimitivo    ::= INTEGER | BOOLEAN;
 
 // Declaracion de expresiones ---------------------------------------------------------
 
-//expresiones    ::= expresiones expresion | expresion;
-
 expresion        ::= expresion MINUS expresion
 				   | expresion MULT expresion 
 				   | expresion GREATERTHAN expresion
@@ -275,6 +273,10 @@ variables       ::= variables variable | variable;
 
 variable        ::= ID COLON tipoVariable SEMICOLON | ID COMMA variable;
 
+variable        ::= COLON error {:syntaxErrorManager.syntaxInfo ("Se esperaba ID"); errorCounter ++;:} tipoVariable SEMICOLON
+                  | ID error {:syntaxErrorManager.syntaxInfo ("Se esperaba :"); errorCounter ++;:} tipoVariable SEMICOLON
+                  | ID COLON error {:syntaxErrorManager.syntaxInfo ("Se esperaba un tipo primitivo/id"); errorCounter ++;:} SEMICOLON
+                  | ID COLON tipoVariable error {:syntaxErrorManager.syntaxInfo ("Se esperaba ;"); errorCounter ++;:};
 
 // Declaracion de subprogramas --------------------------------------------------------
 

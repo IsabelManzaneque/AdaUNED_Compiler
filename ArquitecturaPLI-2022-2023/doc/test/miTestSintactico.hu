@@ -1,13 +1,38 @@
 -- programa vacio
 
 procedure testCase01 () is
-
+	
+	-- constantes
+	
 	CIERTO: constant := True;
 	FALSO: constant := False;
 	UNO: constant := 1;
---	TRES:constant := 2-1; -- ERROR, valor no puede ser una expresion
---	DOS: constant := -2; -- ERROR, el entero no ha de llevar signo
---	CINCO: constant := 5 -- ERROR, falta punto y coma
+	
+	-- tipos
+	
+	type Tpersona is record
+		dni: Integer;
+	 	edad : Integer;
+		casado : Boolean;
+	end record;
+	
+	type Tfecha is record
+		dia: Integer;
+		 mes : Integer;
+		 anyo : Integer;
+	end record;
+	
+	type Tcita is record
+		usuario:Tpersona;
+		fecha:Tfecha;
+	end record;
+	
+	-- variables
+	
+	x : Integer;
+	x,y : Integer;
+	a : Boolean;
+	p1,p2: Tpersona;
 	
 begin
 

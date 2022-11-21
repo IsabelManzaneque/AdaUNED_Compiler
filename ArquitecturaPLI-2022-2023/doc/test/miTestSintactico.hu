@@ -5,48 +5,9 @@ procedure testCase01 () is
 	CIERTO: constant := True;
 	FALSO: constant := False;
 	UNO: constant := 1;
-	
-	type Tpersona is record
-		dni: Integer;
-		edad : Integer;
-		casado : Boolean;
-	end record;
-	
-	type Tfecha is record
-		dia: Integer;
-		mes : Integer;	
-	 	anyo : Integer;
-	end record;
-	
-	x : Integer;
-	x,y : Integer;
-	a : Boolean;
-	p1,p2: Tpersona;
-	
-	
-	function uno() return Integer is
-	begin
-		return 1;
-	end uno;
-	
-	function suma (x, y: Integer) return Integer is
-		z: Integer;
-	begin
-		--z:= x+y;
-		return z;
-	end suma;	
-	
-	function mayor (x, y: Integer) return Boolean is
-	begin
-		return x>y;
-	end resta;
-	
-	
-	procedure resta (x, y, z: out Integer) is
-	-- parametros pasados por referencia
-	begin
-		--z:= x-y;
-	end resta;
+--	TRES:constant := 2-1; -- ERROR, valor no puede ser una expresion
+--	DOS: constant := -2; -- ERROR, el entero no ha de llevar signo
+--	CINCO: constant := 5 -- ERROR, falta punto y coma
 	
 begin
 

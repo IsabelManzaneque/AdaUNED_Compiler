@@ -64,12 +64,9 @@ terminal Token COLON;
 
 
 // OPERADORES ARITMETICOS
-terminal Token PLUS;
 terminal Token MINUS;
 terminal Token MULT;
-terminal Token DIV;
 terminal Token GREATERTHAN;
-terminal Token LESSTHAN;
 terminal Token NOTEQUAL;
 terminal Token ASIGN;
 terminal Token ACCESS;
@@ -146,7 +143,6 @@ non terminal parametro;
 
 precedence left     AND; 
 precedence left     NOTEQUAL;
-precedence left     LESSTHAN;
 precedence left     GREATERTHAN;
 precedence left     MINUS;
 precedence left     MULT;
@@ -223,11 +219,8 @@ tipoPrimitivo    ::= INTEGER | BOOLEAN;
 //expresiones    ::= expresiones expresion | expresion;
 
 expresion        ::= expresion MINUS expresion
-				//   | expresion PLUS expresion los que no tienen precedencia izq dan problemas
-				//   | expresion MULT expresion
-				//   | expresion DIV expresion
+				   | expresion MULT expresion 
 				   | expresion GREATERTHAN expresion
-				   | expresion LESSTHAN expresion
 				   | expresion NOTEQUAL expresion
 				   | expresion AND expresion
 				   | LEFTBRACKET expresion RIGHTBRACKET
@@ -267,6 +260,13 @@ parametro        ::= expresion | STRING;
 constantesSimbolicas ::= constantesSimbolicas constanteSimbolica | constanteSimbolica;
 
 constanteSimbolica   ::= ID COLON CONSTANT ASIGN tipoConstante SEMICOLON;
+
+constanteSimbolica   ::= COLON error {:syntaxErrorManager.syntaxInfo ("Se esperaba ID"); errorCounter ++;:} CONSTANT ASIGN tipoConstante SEMICOLON
+					   | ID error {:syntaxErrorManager.syntaxInfo ("Se esperaba :"); errorCounter ++;:} CONSTANT ASIGN tipoConstante SEMICOLON
+					   | ID COLON error {:syntaxErrorManager.syntaxInfo ("Se esperaba constant"); errorCounter ++;:} ASIGN tipoConstante SEMICOLON
+					   | ID COLON CONSTANT error {:syntaxErrorManager.syntaxInfo ("Se esperaba :="); errorCounter ++;:} tipoConstante SEMICOLON
+					   | ID COLON CONSTANT ASIGN error {:syntaxErrorManager.syntaxInfo ("Se esperaba un valor entero/logico"); errorCounter ++;:} SEMICOLON
+					   | ID COLON CONSTANT ASIGN tipoConstante error {:syntaxErrorManager.syntaxInfo ("Se esperaba ;"); errorCounter ++;:};					   
 
 
 // Declaracion de variables -----------------------------------------------------------

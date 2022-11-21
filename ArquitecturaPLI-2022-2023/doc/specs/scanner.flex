@@ -43,8 +43,7 @@ STRING      = \".*\"
 DIGIT       = [0-9]
 INT         = {DIGIT}+                          
 ID          = ({LETTER}({LETTER}|{DIGIT})*)                                       
-WRONG_ID    = (({INT}|{ESP_CHAR})+({ID}|{INT}|{ESP_CHAR})*) | ({ID}{ESP_CHAR}+({ID}|{INT}|{ESP_CHAR})*)   
-//SINGLE      =       
+WRONG_ID    = (({INT}|{ESP_CHAR})+({ID}|{INT}|{ESP_CHAR})*) | ({ID}{ESP_CHAR}+({ID}|{INT}|{ESP_CHAR})*)        
 SALTO_LINEA =[\r\n]
 COMMENT     = "--" ~{SALTO_LINEA}               
 
@@ -114,13 +113,7 @@ COMMENT     = "--" ~{SALTO_LINEA}
                        
      // OPERADORES ARITMETICOS
      
-     "+"                {  
-                           Token token = new Token (sym.PLUS);   // nuevo objeto token
-                           token.setLine (yyline + 1);           // fija la linea
-                           token.setColumn (yycolumn + 1);       // fija la columna
-                           token.setLexema (yytext ());          // fija el lexema
-           			       return token;                         // devuelve el token
-                        }
+   
     
      "-"                {  
                            Token token = new Token (sym.MINUS);
@@ -138,14 +131,7 @@ COMMENT     = "--" ~{SALTO_LINEA}
            			       return token;
                         }
                        
-     "/"                {  
-                           Token token = new Token (sym.DIV);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-           			       return token;
-                        }
-                        
+                            
      ">"                {  
                            Token token = new Token (sym.GREATERTHAN);
                            token.setLine (yyline + 1);
@@ -154,13 +140,6 @@ COMMENT     = "--" ~{SALTO_LINEA}
            			       return token;
                         }
                        
-     "<"                {  
-                           Token token = new Token (sym.LESSTHAN);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-           			       return token;
-                        }
                         
      "/="               {  
                            Token token = new Token (sym.NOTEQUAL);
@@ -392,7 +371,7 @@ COMMENT     = "--" ~{SALTO_LINEA}
                            error.setLine (yyline + 1);
 	                       error.setColumn (yycolumn + 1);
 	                       error.setLexema (yytext ());
-	                       lexicalErrorManager.lexicalError ("ERROR: "+error+", ID = "+yytext()+", Identificador no valido");
+	                       lexicalErrorManager.lexicalError ("Error en la linea " + error.getLine() + ", columna " + error.getColumn() +", Identificador no valido: " + yytext());	                       
 	                    }
      
      {COMMENT}          {}		   
@@ -409,10 +388,9 @@ COMMENT     = "--" ~{SALTO_LINEA}
                            LexicalError error = new LexicalError ();
                            error.setLine (yyline + 1);
                            error.setColumn (yycolumn + 1);
-                           error.setLexema (yytext ());
-                           lexicalErrorManager.lexicalError (error);
-                           //lexicalErrorManager.lexicalFatalError("Error en la linea [" + error.getLine() + ":" + error.getColumn() + "] Caracter no esperado: " + error.getLexema());
-                           //lexicalErrorManager.lexicalError ("Token no valido: "+yytext()+" ERROR: "+error);
+                           error.setLexema (yytext ());               
+                           lexicalErrorManager.lexicalError("Error en la linea " + error.getLine() + ", columna " + error.getColumn() + ", Caracter no esperado: " + error.getLexema());
+                                
                         }
      	
     

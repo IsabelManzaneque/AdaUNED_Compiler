@@ -34,6 +34,25 @@ procedure testCase01 () is
 	a : Boolean;
 	p1,p2: Tpersona;
 	
+	-- funciones
+	
+	function uno() return Integer is
+	begin
+		return 1;
+	end uno;
+	
+	function resta (x, y: Integer) return Integer is
+		z: Integer;
+	begin
+		z:= x-y;
+		return z;
+	end resta;
+	
+	function mayor (x, y: Integer) return Boolean is
+	begin
+		return x>y;
+	end resta;
+	
 begin
 
 end testCase01;

@@ -284,13 +284,15 @@ subprogramas    ::= subprogramas subprograma | subprograma;
 
 subprograma     ::= funcion | procedimiento;
 
-funcion         ::= FUNCTION ID LEFTBRACKET parametrosSubprograma RIGHTBRACKET RETURN tipoPrimitivo IS cuerpo;
+funcion         ::= FUNCTION ID LEFTBRACKET parametrosSubprograma RIGHTBRACKET RETURN tipoPrimitivo IS cuerpo
+				  | FUNCTION ID LEFTBRACKET RIGHTBRACKET RETURN tipoPrimitivo IS cuerpo;
 
-procedimiento   ::= PROCEDURE ID LEFTBRACKET parametrosSubprograma RIGHTBRACKET IS cuerpo;
+procedimiento   ::= PROCEDURE ID LEFTBRACKET parametrosSubprograma RIGHTBRACKET IS cuerpo
+				  | PROCEDURE ID LEFTBRACKET RIGHTBRACKET IS cuerpo;
 
 parametrosSubprograma  ::= parametrosSubprograma parametroSubprograma | parametroSubprograma;
 
-parametroSubprograma   ::= ID COLON OUT tipo | ID COMMA parametroSubprograma;
+parametroSubprograma   ::= ID COLON OUT tipo | ID COLON tipo | ID COMMA parametroSubprograma;
 
 
 

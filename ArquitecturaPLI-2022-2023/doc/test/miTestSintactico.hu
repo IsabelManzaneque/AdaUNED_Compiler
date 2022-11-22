@@ -16,8 +16,8 @@ procedure testCase01 () is
 	
 	type Tfecha is record
 		dia: Integer;
-		 mes : Integer;
-		 anyo : Integer;
+		mes : Integer;
+		anyo : Integer;
 	end record;
 	
 	type Tcita is record
@@ -30,38 +30,32 @@ procedure testCase01 () is
 	x,y : Integer;
 	a : Boolean;
 	p1,p2: Tpersona;
-	
-	-- funciones	
-	function uno() return Integer is
-	begin
-		return 1;
-	end uno;
-	
-	function resta (x, y: Integer) return Integer is
-		z: Integer;
-	begin
-		z:= x-y;
-		return z;
-	end resta;
-	
-	function mayor (x, y: Integer) return Boolean is
-	begin
-		return x>y;
-	end resta;
-	
+		
 	-- procedimientos	
 	procedure vacio()is
 	begin
 	end vacio;
 	
 	procedure resta (x, y, z: out Integer) is
-	
+		
+		type Tcita is record
+			usuario:Tpersona;
+			fecha:Tfecha;
+		end record;
+		
+		z: Integer;
+		
+		procedure vacio()is
+		begin
+		end vacio;
+		
 	begin
 		z:= x-y;
 	end resta;
 	
 	procedure mayor (x, y: out Integer; a: out Boolean) is
 	begin	
+		y := resta(a, resta(b, c));
 		a:=x>y;
 	end suma;
 		
@@ -70,14 +64,7 @@ procedure testCase01 () is
 	begin
 		return 1;
 	end uno;
-	
-	function resta (x, y: Integer) return Integer is
-		z: Integer;
-	begin
-		z:= x-y;
-		return z;
-	end suma;
-	
+		
 	function mayor (x, y: Integer) return Boolean is
 	begin
 		return x>y;
@@ -95,13 +82,26 @@ procedure testCase01 () is
 		return z;
 	end padre;
 	
-	function resta (a,b:Integer) return Integer is
+	function resta (x, y: Integer) return Integer is
+		
+		type Tcita is record
+			usuario:Tpersona;
+			fecha:Tfecha;
+		end record;
+		
+		z: Integer;
+		
+		procedure vacio()is
+		begin
+		end vacio;
 	begin
+		y := resta(a, resta(b, c));
 		z:= x-y;
 		return z;
-	end suma;
+	end resta;	
 	
 begin 
+	
 	
 	--sentencias
 	-- llamadas a funciones
@@ -115,6 +115,7 @@ begin
 	distinto := 3/=4; -- distinto es variable lógica
 	cita1.usuario.edad := 30;
 	a := 2 - resta(2,2);
+	mayorEdad.edad := c1.usuario.edad > 18;
 	
 	-- sentencias IF	
 	if a/=b then
@@ -129,16 +130,40 @@ begin
 	if a/=b and (x>y and x>z) then
 	    a:=a-1;
 	    b:=b-1;
+	    
+	    if a/=b and x>y then
+			a:=a-1;
+			b:=b-1;
+		end if;
 	end if;
+	
 
 	if esCierto then
 	   valor:=true;
 	else
 	   valor:=false;
+	   while a>5 loop
+	 		a:=a-1;
+	 		Put_line (a);
+	   end loop;
 	end if;
 	
 	-- sentencias while	
 	while a>5 loop
+ 		a:=a-1;
+ 		Put_line (a);
+	end loop;
+	
+	while a>5 loop
+		
+		if a/=b and (x>y and x>z) then
+		    a:=a-1;
+		    b:=b-1;		    
+		    if a/=b and x>y then
+				a:=a-1;
+				b:=b-1;
+			end if;
+	    end if;
  		a:=a-1;
  		Put_line (a);
 	end loop;

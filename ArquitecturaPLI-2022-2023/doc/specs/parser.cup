@@ -107,7 +107,6 @@ non terminal Axiom		axiom;
 
 non terminal cabecera;
 non terminal cuerpo;
-non terminal declaraciones;
 non terminal declaracionesGlobales;
 non terminal declaracionesComunes;
 
@@ -116,7 +115,6 @@ non terminal sentencias;
 non terminal sentenciaES;
 non terminal sentenciaAsign;
 non terminal sentenciaIf;
-non terminal sentenciaReturn;
 non terminal sentenciaWhile;
 non terminal sentenciaSubprograma;
 
@@ -195,7 +193,6 @@ cuerpo         ::= declaracionesGlobales BEGIN sentencias END ID SEMICOLON
 
 // Declaraciones --------------------------------------------------------------------------------------------------
 
-
 declaracionesGlobales  ::= constantesSimbolicas declaracionesComunes 
  				         | declaracionesComunes
  				         | constantesSimbolicas;  
@@ -207,7 +204,10 @@ declaracionesComunes   ::= tipos variables subprogramas
 		           		 | tipos
 		           		 | variables
 		           		 | subprogramas
-		           		 | error {:syntaxErrorManager.syntaxInfo ("Estructura de declaraciones incorrecta"); errorCounter ++;:};     		 
+		           		 | error {:syntaxErrorManager.syntaxInfo ("Estructura de declaraciones incorrecta"); errorCounter ++;:};     	
+
+		           		 
+		           		  
 
 // Declaracion de tipos -------------------------------------------------------------------------------------------
 
@@ -232,6 +232,7 @@ tipoEstructurado ::= TYPE ID IS RECORD variables END RECORD SEMICOLON
 tipoPrimitivo    ::= INTEGER | BOOLEAN;
 
 
+
 // Declaracion de expresiones ------------------------------------------------------------------------------------
 
 expresion        ::= expresion MINUS expresion
@@ -251,6 +252,7 @@ expresion        ::= expresion MINUS expresion
 				   | FALSE;
 				   
 
+
 // Declaracion de sentencias ------------------------------------------------------------------------------------
 
 sentencias       ::= sentencia SEMICOLON | sentencias sentencia SEMICOLON;
@@ -258,7 +260,6 @@ sentencias       ::= sentencia SEMICOLON | sentencias sentencia SEMICOLON;
 sentencia        ::= sentenciaES
                    | sentenciaAsign
                    | sentenciaIf
-//                 | sentenciaReturn
 				   | sentenciaWhile
 				   | sentenciaSubprograma;
 
@@ -268,13 +269,12 @@ sentenciaAsign     ::= ID ACCESS sentenciaAsign | ID ASIGN expresion;
 
 sentenciaIf        ::= IF expresion THEN sentencias END IF | IF expresion THEN sentencias ELSE sentencias END IF;
 
-//sentenciaReturn  ::= RETURN expresion;
-
 sentenciaWhile     ::= WHILE expresion LOOP sentencias END LOOP;
 
 sentenciaSubprograma ::= ID LEFTBRACKET parametro RIGHTBRACKET | ID LEFTBRACKET RIGHTBRACKET; 
 
 parametro          ::= expresion | STRING;
+
 
 
 // Declaracion de constantes -----------------------------------------------------------------------------------
@@ -292,6 +292,7 @@ constanteSimbolica   ::= COLON error {:syntaxErrorManager.syntaxInfo ("Falta ID 
 
 
 
+
 // Declaracion de variables -----------------------------------------------------------------------------------
 
 variables       ::= variables variable | variable; 
@@ -304,6 +305,7 @@ variable        ::= COLON error {:syntaxErrorManager.syntaxInfo ("Falta ID en va
                   | ID COLON tipoVariable error {:syntaxErrorManager.syntaxInfo ("Falta ';' en variable"); errorCounter ++;:};
                   
                   
+
 
 // Declaracion de subprogramas --------------------------------------------------------------------------------
 
@@ -327,7 +329,7 @@ cuerpoFuncion         ::= declaracionesComunes BEGIN sentencias RETURN expresion
 	 		            | BEGIN RETURN expresion SEMICOLON END ID SEMICOLON
 	 		            | sentencias RETURN {:syntaxErrorManager.syntaxInfo ("Falta 'begin' en funcion"); errorCounter ++;:} expresion SEMICOLON END ID SEMICOLON
 	 		            | RETURN {:syntaxErrorManager.syntaxInfo ("Falta 'begin' en funcion"); errorCounter ++;:} expresion SEMICOLON END ID SEMICOLON;
-					  //quedan errores por completar 	
+					  	//quedan errores por completar 	
 					
 procedimiento         ::= PROCEDURE ID LEFTBRACKET parametrosSubprograma RIGHTBRACKET IS cuerpoProcedimiento
 				        | PROCEDURE ID LEFTBRACKET RIGHTBRACKET IS cuerpoProcedimiento;

@@ -192,15 +192,15 @@ cabecera       ::= PROCEDURE ID LEFTBRACKET RIGHTBRACKET IS
 cuerpo         ::= declaracionesGlobales BEGIN sentencias END ID SEMICOLON
  		         | BEGIN sentencias END ID SEMICOLON
  		         | declaracionesGlobales BEGIN END ID SEMICOLON
- 		         | BEGIN END ID SEMICOLON;        
-  //               | error {:syntaxErrorManager.syntaxInfo ("Error en la estructura del cuerpo del programa"); errorCounter ++;:};
+ 		         | BEGIN END ID SEMICOLON; 
 
 
 // Declaraciones --------------------------------------------------------------------------------------------------
 
 declaracionesGlobales  ::= constantesSimbolicas declaracionesComunes 
  				         | declaracionesComunes
- 				         | constantesSimbolicas;  
+ 				         | constantesSimbolicas
+ 				         | error {:syntaxErrorManager.syntaxInfo ("Estructura de declaraciones incorrecta"); errorCounter ++;:};
            				        		 
 declaracionesComunes   ::= tipos variables subprogramas
 		           		 | tipos variables
@@ -208,53 +208,55 @@ declaracionesComunes   ::= tipos variables subprogramas
 		           		 | variables subprogramas           		 
 		           		 | tipos
 		           		 | variables
-		           		 | subprogramas;
-		       //    		 | error {:syntaxErrorManager.syntaxInfo ("Estructura de declaraciones incorrecta"); errorCounter ++;:};     	
-
-		           		 
-		           		  
+		           		 | subprogramas
+		           		 | variables tipos {:syntaxErrorManager.syntaxInfo ("Estructura de declaraciones incorrecta"); errorCounter ++;:}
+		           		 | subprogramas tipos {:syntaxErrorManager.syntaxInfo ("Estructura de declaraciones incorrecta"); errorCounter ++;:}
+		           		 | subprogramas variables {:syntaxErrorManager.syntaxInfo ("Estructura de declaraciones incorrecta"); errorCounter ++;:}
+		           		 | tipos subprogramas variables {:syntaxErrorManager.syntaxInfo ("Estructura de declaraciones incorrecta"); errorCounter ++;:};
+		                      	
+  		 		           		  
 
 // Declaracion de tipos -------------------------------------------------------------------------------------------
 
-tipoConstante    ::= TRUE | FALSE | INTEGER;
+tipoConstante      ::= TRUE | FALSE | INTEGER;
 
-tipoVariable     ::= tipoPrimitivo | ID;
+tipoVariable       ::= tipoPrimitivo | ID;
 
-tipos            ::= tipos tipo | tipo;
+tipos              ::= tipos tipo | tipo;
+ 
+tipo               ::= tipoPrimitivo | tipoEstructurado;
 
-tipo             ::= tipoPrimitivo | tipoEstructurado;
+tipoEstructurado   ::= TYPE ID IS RECORD variables END RECORD SEMICOLON
+				     | ID error {:syntaxErrorManager.syntaxInfo ("Falta 'type' en tipo estructurado"); errorCounter ++;:} IS RECORD variables END RECORD SEMICOLON
+				     | TYPE error {:syntaxErrorManager.syntaxInfo ("Falta ID en tipo estructurado");errorCounter ++;:} IS RECORD variables END RECORD SEMICOLON
+				     | TYPE ID error {:syntaxErrorManager.syntaxInfo ("Falta 'is' en tipo estructurado");errorCounter ++;:} RECORD variables END RECORD SEMICOLON
+				     | TYPE ID IS error {:syntaxErrorManager.syntaxInfo ("Falta 'record' en tipo estructurado");errorCounter ++;:} variables END RECORD SEMICOLON
+				     | TYPE ID IS RECORD error {:syntaxErrorManager.syntaxInfo ("Falta cuerpo en tipo estructurado");errorCounter ++;:} END RECORD SEMICOLON
+				     | TYPE ID IS RECORD variables error {:syntaxErrorManager.syntaxInfo ("Falta 'end' en tipo estructurado");errorCounter ++;:} RECORD SEMICOLON
+				     | TYPE ID IS RECORD variables END error {:syntaxErrorManager.syntaxInfo ("Falta 'record' en tipo estructurado");errorCounter ++;:} SEMICOLON
+				     | TYPE ID IS RECORD variables END RECORD error {:syntaxErrorManager.syntaxInfo ("Falta ';' en tipo estructurado");errorCounter ++;:};
 
-tipoEstructurado ::= TYPE ID IS RECORD variables END RECORD SEMICOLON
-				   | ID error {:syntaxErrorManager.syntaxInfo ("Falta 'type' en tipo estructurado"); errorCounter ++;:} IS RECORD variables END RECORD SEMICOLON
-				   | TYPE error {:syntaxErrorManager.syntaxInfo ("Falta ID en tipo estructurado");errorCounter ++;:} IS RECORD variables END RECORD SEMICOLON
-				   | TYPE ID error {:syntaxErrorManager.syntaxInfo ("Falta 'is' en tipo estructurado");errorCounter ++;:} RECORD variables END RECORD SEMICOLON
-				   | TYPE ID IS error {:syntaxErrorManager.syntaxInfo ("Falta 'record' en tipo estructurado");errorCounter ++;:} variables END RECORD SEMICOLON
-				   | TYPE ID IS RECORD error {:syntaxErrorManager.syntaxInfo ("Falta cuerpo en tipo estructurado");errorCounter ++;:} END RECORD SEMICOLON
-				   | TYPE ID IS RECORD variables error {:syntaxErrorManager.syntaxInfo ("Falta 'end' en tipo estructurado");errorCounter ++;:} RECORD SEMICOLON
-				   | TYPE ID IS RECORD variables END error {:syntaxErrorManager.syntaxInfo ("Falta 'record' en tipo estructurado");errorCounter ++;:} SEMICOLON
-				   | TYPE ID IS RECORD variables END RECORD error {:syntaxErrorManager.syntaxInfo ("Falta ';' en tipo estructurado");errorCounter ++;:};
-
-tipoPrimitivo    ::= INTEGER | BOOLEAN;
+tipoPrimitivo      ::= INTEGER | BOOLEAN;
 
 
 
 // Declaracion de expresiones ------------------------------------------------------------------------------------
 
-expresion        ::= expresion MINUS expresion
-				   | expresion MULT expresion 
-				   | expresion GREATERTHAN expresion
-				   | expresion NOTEQUAL expresion
-				   | expresion AND expresion
-				   | expresion ACCESS expresion
-				   | ID LEFTBRACKET RIGHTBRACKET
-				   | LEFTBRACKET expresion RIGHTBRACKET
-				   | ID LEFTBRACKET expresion RIGHTBRACKET
-				   | ID COMMA expresion
-				   | INTEGER COMMA expresion
-			       | ID      
-				   | INTEGER
-				   | TRUE
-				   | FALSE;
+expresion          ::= expresion MINUS expresion
+		 		     | expresion MULT expresion 
+				     | expresion GREATERTHAN expresion
+				     | expresion NOTEQUAL expresion
+				     | expresion AND expresion
+				     | expresion ACCESS expresion
+				     | ID LEFTBRACKET RIGHTBRACKET
+				     | LEFTBRACKET expresion RIGHTBRACKET
+				     | ID LEFTBRACKET expresion RIGHTBRACKET
+				     | ID COMMA expresion
+				     | INTEGER COMMA expresion
+			         | ID      
+				     | INTEGER
+				     | TRUE
+				     | FALSE;
 				   
 
 
@@ -277,12 +279,10 @@ sentenciaAsign     ::= ID ACCESS sentenciaAsign | ID ASIGN expresion;
 
 sentenciaIf        ::= IF expresion THEN sentencias END IF 
                      | IF expresion THEN sentencias ELSE sentencias END IF
-//					 | expresion error {:syntaxErrorManager.syntaxInfo ("Falta 'if' en sentencia if");errorCounter ++;:} THEN sentencias END IF
                      | IF expresion error {:syntaxErrorManager.syntaxInfo ("sentencia if mal formada");errorCounter ++;:} sentencias END IF
                      | IF expresion THEN sentencias error {:syntaxErrorManager.syntaxInfo ("Falta 'end' en sentencia if");errorCounter ++;:} IF;
 
 sentenciaWhile     ::= WHILE expresion LOOP sentencias END LOOP
-//                   | expresion {:syntaxErrorManager.syntaxInfo ("Falta 'while' en sentencia while");errorCounter ++;:} LOOP sentencias END LOOP
                      | WHILE expresion error {:syntaxErrorManager.syntaxInfo ("Falta 'loop' en sentencia while");errorCounter ++;:} sentencias END LOOP
                      | WHILE expresion LOOP sentencias error {:syntaxErrorManager.syntaxInfo ("Falta 'end' en sentencia while");errorCounter ++;:} LOOP
                      | WHILE expresion LOOP sentencias END error{:syntaxErrorManager.syntaxInfo ("Falta 'loop' en sentencia while");errorCounter ++;:};

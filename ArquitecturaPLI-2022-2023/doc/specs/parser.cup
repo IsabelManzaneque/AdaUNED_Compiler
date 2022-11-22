@@ -108,6 +108,8 @@ non terminal Axiom		axiom;
 non terminal cabecera;
 non terminal cuerpo;
 non terminal declaraciones;
+non terminal declaracionesGlobales;
+non terminal declaracionesComunes;
 
 non terminal sentencia;
 non terminal sentencias;
@@ -116,6 +118,7 @@ non terminal sentenciaAsign;
 non terminal sentenciaIf;
 non terminal sentenciaReturn;
 non terminal sentenciaWhile;
+non terminal sentenciaSubprograma;
 
 non terminal tipo;
 non terminal tipos;
@@ -136,10 +139,12 @@ non terminal parametroSubprograma;
 non terminal subprograma;
 non terminal subprogramas;
 non terminal funcion;
+non terminal cuerpoFuncion;
 non terminal procedimiento;
+non terminal cuerpoProcedimiento;
 non terminal parametro;
 
-// Declaracion de relaciones de precedencia ------------------------------------------------
+// Declaracion de relaciones de precedencia ------------------------------------------------------------------
 
 precedence left     AND; 
 precedence left     NOTEQUAL;
@@ -149,7 +154,7 @@ precedence left     MULT;
 precedence left     ACCESS, LEFTBRACKET, RIGHTBRACKET; 
 
 
-// Declaración de reglas de produccion -----------------------------------------------------
+// Declaración de reglas de produccion -------------------------------------------------------------------------
 
 
 start with program;
@@ -172,34 +177,39 @@ program ::=
 //                                                    //
 ////////////////////////////////////////////////////////
 
-// Estructura del programa -----------------------------------------------------------
+// errores genericos 
+
+// Estructura del programa ----------------------------------------------------------------------------------------
 
 axiom          ::= cabecera cuerpo;
 
-cabecera       ::= PROCEDURE ID LEFTBRACKET RIGHTBRACKET IS;
+cabecera       ::= PROCEDURE ID LEFTBRACKET RIGHTBRACKET IS
+			     | error {:syntaxErrorManager.syntaxInfo ("Error en la cabecera del programa"); errorCounter ++;:};
 
-cuerpo         ::= declaraciones BEGIN sentencias END ID SEMICOLON
+cuerpo         ::= declaracionesGlobales BEGIN sentencias END ID SEMICOLON
  		         | BEGIN sentencias END ID SEMICOLON
- 		         | declaraciones BEGIN END ID SEMICOLON
- 		         | BEGIN END ID SEMICOLON;
- 		         
-declaraciones  ::= constantesSimbolicas tipos variables subprogramas 
- 				 | constantesSimbolicas variables subprogramas 
- 				 | constantesSimbolicas tipos subprogramas
- 				 | constantesSimbolicas tipos variables
-                 | constantesSimbolicas tipos
-           		 | constantesSimbolicas variables
-           		 | constantesSimbolicas subprogramas
-           		 | tipos variables
-           		 | tipos subprogramas
-           		 | variables subprogramas
-           		 | constantesSimbolicas 
-           		 | tipos
-           		 | variables
-           		 | subprogramas;
-           		 
+ 		         | declaracionesGlobales BEGIN END ID SEMICOLON
+ 		         | BEGIN END ID SEMICOLON;		         
 
-// Declaracion de tipos ---------------------------------------------------------------
+
+
+// Declaraciones --------------------------------------------------------------------------------------------------
+
+
+declaracionesGlobales  ::= constantesSimbolicas declaracionesComunes 
+ 				         | declaracionesComunes
+ 				         | constantesSimbolicas;  
+           				        		 
+declaracionesComunes   ::= tipos variables subprogramas
+		           		 | tipos variables
+		           		 | tipos subprogramas           		 
+		           		 | variables subprogramas           		 
+		           		 | tipos
+		           		 | variables
+		           		 | subprogramas
+		           		 | error {:syntaxErrorManager.syntaxInfo ("Estructura de declaraciones incorrecta"); errorCounter ++;:};     		 
+
+// Declaracion de tipos -------------------------------------------------------------------------------------------
 
 tipoConstante    ::= TRUE | FALSE | INTEGER;
 
@@ -209,91 +219,133 @@ tipos            ::= tipos tipo | tipo;
 
 tipo             ::= tipoPrimitivo | tipoEstructurado;
 
-tipoEstructurado ::= TYPE ID IS RECORD variables END RECORD SEMICOLON; 
+tipoEstructurado ::= TYPE ID IS RECORD variables END RECORD SEMICOLON
+				   | ID error {:syntaxErrorManager.syntaxInfo ("Falta 'type' en tipo estructurado"); errorCounter ++;:} IS RECORD variables END RECORD SEMICOLON
+				   | TYPE error {:syntaxErrorManager.syntaxInfo ("Falta ID en tipo estructurado");errorCounter ++;:} IS RECORD variables END RECORD SEMICOLON
+				   | TYPE ID error {:syntaxErrorManager.syntaxInfo ("Falta 'is' en tipo estructurado");errorCounter ++;:} RECORD variables END RECORD SEMICOLON
+				   | TYPE ID IS error {:syntaxErrorManager.syntaxInfo ("Falta 'record' en tipo estructurado");errorCounter ++;:} variables END RECORD SEMICOLON
+				   | TYPE ID IS RECORD error {:syntaxErrorManager.syntaxInfo ("Falta cuerpo en tipo estructurado");errorCounter ++;:} END RECORD SEMICOLON
+				   | TYPE ID IS RECORD variables error {:syntaxErrorManager.syntaxInfo ("Falta 'end' en tipo estructurado");errorCounter ++;:} RECORD SEMICOLON
+				   | TYPE ID IS RECORD variables END error {:syntaxErrorManager.syntaxInfo ("Falta 'record' en tipo estructurado");errorCounter ++;:} SEMICOLON
+				   | TYPE ID IS RECORD variables error END RECORD {:syntaxErrorManager.syntaxInfo ("Falta ';' en tipo estructurado");errorCounter ++;:};
 
 tipoPrimitivo    ::= INTEGER | BOOLEAN;
 
 
-// Declaracion de expresiones ---------------------------------------------------------
+// Declaracion de expresiones ------------------------------------------------------------------------------------
 
 expresion        ::= expresion MINUS expresion
 				   | expresion MULT expresion 
 				   | expresion GREATERTHAN expresion
 				   | expresion NOTEQUAL expresion
 				   | expresion AND expresion
+				   | expresion ACCESS expresion
+				   | ID LEFTBRACKET RIGHTBRACKET
 				   | LEFTBRACKET expresion RIGHTBRACKET
 				   | ID LEFTBRACKET expresion RIGHTBRACKET
 				   | ID COMMA expresion
-			       | ID       
+				   | INTEGER COMMA expresion
+			       | ID      
 				   | INTEGER
 				   | TRUE
 				   | FALSE;
 				   
 
-// Declaracion de sentencias ----------------------------------------------------------
+// Declaracion de sentencias ------------------------------------------------------------------------------------
 
 sentencias       ::= sentencia SEMICOLON | sentencias sentencia SEMICOLON;
 
 sentencia        ::= sentenciaES
                    | sentenciaAsign
                    | sentenciaIf
-                   | sentenciaReturn
-				   | sentenciaWhile;
+//                 | sentenciaReturn
+				   | sentenciaWhile
+				   | sentenciaSubprograma;
 
-sentenciaES      ::= PUT_LINE LEFTBRACKET parametro RIGHTBRACKET;
+sentenciaES        ::= PUT_LINE LEFTBRACKET parametro RIGHTBRACKET;
 
-sentenciaAsign   ::= ID ASIGN expresion;
+sentenciaAsign     ::= ID ACCESS sentenciaAsign | ID ASIGN expresion;
 
-sentenciaIf      ::= IF expresion THEN sentencias END IF | IF expresion THEN sentencias ELSE sentencias END IF;
+sentenciaIf        ::= IF expresion THEN sentencias END IF | IF expresion THEN sentencias ELSE sentencias END IF;
 
-sentenciaReturn  ::= RETURN expresion;
+//sentenciaReturn  ::= RETURN expresion;
 
-sentenciaWhile   ::= WHILE expresion LOOP sentencias END LOOP;
+sentenciaWhile     ::= WHILE expresion LOOP sentencias END LOOP;
 
-parametro        ::= expresion | STRING;
+sentenciaSubprograma ::= ID LEFTBRACKET parametro RIGHTBRACKET | ID LEFTBRACKET RIGHTBRACKET; 
+
+parametro          ::= expresion | STRING;
 
 
-// Declaracion de constantes ----------------------------------------------------------
+// Declaracion de constantes -----------------------------------------------------------------------------------
 
 constantesSimbolicas ::= constantesSimbolicas constanteSimbolica | constanteSimbolica;
 
 constanteSimbolica   ::= ID COLON CONSTANT ASIGN tipoConstante SEMICOLON;
 
-constanteSimbolica   ::= COLON error {:syntaxErrorManager.syntaxInfo ("Se esperaba ID"); errorCounter ++;:} CONSTANT ASIGN tipoConstante SEMICOLON
-					   | ID error {:syntaxErrorManager.syntaxInfo ("Se esperaba :"); errorCounter ++;:} CONSTANT ASIGN tipoConstante SEMICOLON
-					   | ID COLON error {:syntaxErrorManager.syntaxInfo ("Se esperaba constant"); errorCounter ++;:} ASIGN tipoConstante SEMICOLON
-					   | ID COLON CONSTANT error {:syntaxErrorManager.syntaxInfo ("Se esperaba :="); errorCounter ++;:} tipoConstante SEMICOLON
-					   | ID COLON CONSTANT ASIGN error {:syntaxErrorManager.syntaxInfo ("Se esperaba un valor entero/logico"); errorCounter ++;:} SEMICOLON
-					   | ID COLON CONSTANT ASIGN tipoConstante error {:syntaxErrorManager.syntaxInfo ("Se esperaba ;"); errorCounter ++;:};					   
+constanteSimbolica   ::= COLON error {:syntaxErrorManager.syntaxInfo ("Falta ID en constante"); errorCounter ++;:} CONSTANT ASIGN tipoConstante SEMICOLON
+					   | ID error {:syntaxErrorManager.syntaxInfo ("Falta ':' en constante"); errorCounter ++;:} CONSTANT ASIGN tipoConstante SEMICOLON
+					   | ID COLON error {:syntaxErrorManager.syntaxInfo ("Falta 'constant' en constante"); errorCounter ++;:} ASIGN tipoConstante SEMICOLON
+					   | ID COLON CONSTANT error {:syntaxErrorManager.syntaxInfo ("Falta ':=' en constante"); errorCounter ++;:} tipoConstante SEMICOLON
+					   | ID COLON CONSTANT ASIGN error {:syntaxErrorManager.syntaxInfo ("Falta valor entero/logico en constante"); errorCounter ++;:} SEMICOLON
+					   | ID COLON CONSTANT ASIGN tipoConstante error {:syntaxErrorManager.syntaxInfo ("Falta ';' en constante"); errorCounter ++;:};					   
 
 
-// Declaracion de variables -----------------------------------------------------------
+
+// Declaracion de variables -----------------------------------------------------------------------------------
 
 variables       ::= variables variable | variable; 
 
 variable        ::= ID COLON tipoVariable SEMICOLON | ID COMMA variable;
 
-variable        ::= COLON error {:syntaxErrorManager.syntaxInfo ("Se esperaba ID"); errorCounter ++;:} tipoVariable SEMICOLON
-                  | ID error {:syntaxErrorManager.syntaxInfo ("Se esperaba :"); errorCounter ++;:} tipoVariable SEMICOLON
-                  | ID COLON error {:syntaxErrorManager.syntaxInfo ("Se esperaba un tipo primitivo/id"); errorCounter ++;:} SEMICOLON
-                  | ID COLON tipoVariable error {:syntaxErrorManager.syntaxInfo ("Se esperaba ;"); errorCounter ++;:};
+variable        ::= COLON error {:syntaxErrorManager.syntaxInfo ("Falta ID en variable"); errorCounter ++;:} tipoVariable SEMICOLON
+                  | ID error {:syntaxErrorManager.syntaxInfo ("Falta ':' en variable"); errorCounter ++;:} tipoVariable SEMICOLON
+                  | ID COLON error {:syntaxErrorManager.syntaxInfo ("Falta tipo primitivo/id en variable"); errorCounter ++;:} SEMICOLON
+                  | ID COLON tipoVariable error {:syntaxErrorManager.syntaxInfo ("Falta ';' en variable"); errorCounter ++;:};
+                  
+                  
 
-// Declaracion de subprogramas --------------------------------------------------------
+// Declaracion de subprogramas --------------------------------------------------------------------------------
 
-subprogramas    ::= subprogramas subprograma | subprograma;
+subprogramas   		  ::= subprogramas subprograma | subprograma;
 
-subprograma     ::= funcion | procedimiento;
+subprograma			  ::= funcion | procedimiento;
 
-funcion         ::= FUNCTION ID LEFTBRACKET parametrosSubprograma RIGHTBRACKET RETURN tipoPrimitivo IS cuerpo
-				  | FUNCTION ID LEFTBRACKET RIGHTBRACKET RETURN tipoPrimitivo IS cuerpo;
+funcion               ::= FUNCTION ID LEFTBRACKET parametrosSubprograma RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
+  					    | FUNCTION ID LEFTBRACKET RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
+					    | ID error {:syntaxErrorManager.syntaxInfo ("Falta 'function' en funcion"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
+					    | FUNCTION error {:syntaxErrorManager.syntaxInfo ("Falta ID en funcion"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
+					    | FUNCTION ID error {:syntaxErrorManager.syntaxInfo ("Falta '(' en funcion"); errorCounter ++;:} RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
+					    | FUNCTION ID LEFTBRACKET error {:syntaxErrorManager.syntaxInfo ("Falta ')' en funcion"); errorCounter ++;:} RETURN tipoPrimitivo IS cuerpoFuncion
+					    | FUNCTION ID LEFTBRACKET RIGHTBRACKET error {:syntaxErrorManager.syntaxInfo ("Falta 'return' en funcion"); errorCounter ++;:} tipoPrimitivo IS cuerpoFuncion
+					    | FUNCTION ID LEFTBRACKET RIGHTBRACKET RETURN error {:syntaxErrorManager.syntaxInfo ("Falta tipo primitivo en funcion"); errorCounter ++;:} IS cuerpoFuncion
+					    | FUNCTION ID LEFTBRACKET RIGHTBRACKET RETURN tipoPrimitivo error {:syntaxErrorManager.syntaxInfo ("Falta 'is' en funcion"); errorCounter ++;:} cuerpoFuncion;
+				  
+cuerpoFuncion         ::= declaracionesComunes BEGIN sentencias RETURN expresion SEMICOLON END ID SEMICOLON
+	 		            | BEGIN sentencias RETURN expresion SEMICOLON END ID SEMICOLON
+	 		            | declaracionesComunes BEGIN RETURN expresion SEMICOLON END ID SEMICOLON
+	 		            | BEGIN RETURN expresion SEMICOLON END ID SEMICOLON
+	 		            | sentencias RETURN {:syntaxErrorManager.syntaxInfo ("Falta 'begin' en funcion"); errorCounter ++;:} expresion SEMICOLON END ID SEMICOLON
+	 		            | RETURN {:syntaxErrorManager.syntaxInfo ("Falta 'begin' en funcion"); errorCounter ++;:} expresion SEMICOLON END ID SEMICOLON;
+					  //quedan errores por completar 	
+					
+procedimiento         ::= PROCEDURE ID LEFTBRACKET parametrosSubprograma RIGHTBRACKET IS cuerpoProcedimiento
+				        | PROCEDURE ID LEFTBRACKET RIGHTBRACKET IS cuerpoProcedimiento;
+				 
+cuerpoProcedimiento   ::= declaracionesComunes BEGIN sentencias END ID SEMICOLON
+ 		                | BEGIN sentencias END ID SEMICOLON
+ 		                | declaracionesComunes BEGIN END ID SEMICOLON
+ 		                | BEGIN END ID SEMICOLON;				 
+			
 
-procedimiento   ::= PROCEDURE ID LEFTBRACKET parametrosSubprograma RIGHTBRACKET IS cuerpo
-				  | PROCEDURE ID LEFTBRACKET RIGHTBRACKET IS cuerpo;
-
-parametrosSubprograma  ::= parametrosSubprograma parametroSubprograma | parametroSubprograma;
+parametrosSubprograma ::= parametrosSubprograma parametroSubprograma 
+					    | parametrosSubprograma SEMICOLON parametroSubprograma
+						| parametroSubprograma;
 
 parametroSubprograma   ::= ID COLON OUT tipo | ID COLON tipo | ID COMMA parametroSubprograma;
 
+
+	
 
 
 

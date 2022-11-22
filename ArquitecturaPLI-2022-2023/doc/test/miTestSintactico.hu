@@ -2,14 +2,12 @@
 
 procedure testCase01 () is
 	
-	-- constantes
-	
+	-- constantes	
 	CIERTO: constant := True;
 	FALSO: constant := False;
 	UNO: constant := 1;
 	
-	-- tipos
-	
+	-- tipos	
 	type Tpersona is record
 		dni: Integer;
 	 	edad : Integer;
@@ -27,15 +25,13 @@ procedure testCase01 () is
 		fecha:Tfecha;
 	end record;
 	
-	-- variables
-	
+	-- variables	
 	x : Integer;
 	x,y : Integer;
 	a : Boolean;
 	p1,p2: Tpersona;
 	
-	-- funciones
-	
+	-- funciones	
 	function uno() return Integer is
 	begin
 		return 1;
@@ -53,6 +49,110 @@ procedure testCase01 () is
 		return x>y;
 	end resta;
 	
-begin
+	-- procedimientos	
+	procedure vacio()is
+	begin
+	end vacio;
+	
+	procedure resta (x, y, z: out Integer) is
+	
+	begin
+		z:= x-y;
+	end resta;
+	
+	procedure mayor (x, y: out Integer; a: out Boolean) is
+	begin	
+		a:=x>y;
+	end suma;
+		
+	-- funciones	
+	function uno() return Integer is
+	begin
+		return 1;
+	end uno;
+	
+	function resta (x, y: Integer) return Integer is
+		z: Integer;
+	begin
+		z:= x-y;
+		return z;
+	end suma;
+	
+	function mayor (x, y: Integer) return Boolean is
+	begin
+		return x>y;
+	end resta;
+	
+	function padre (x:Integer; y:Integer) return Integer is
+		z: Integer;
+		procedure escribe (a: Integer) is
+		begin
+			Put_line (a); 
+		end hijo;
+	begin
+		z:= x-y;
+		escribe (z);
+		return z;
+	end padre;
+	
+	function resta (a,b:Integer) return Integer is
+	begin
+		z:= x-y;
+		return z;
+	end suma;
+	
+begin 
+	
+	--sentencias
+	-- llamadas a funciones
+	x := resta(a, b);
+	y := resta(a, resta(b, c));
+	a := funcion1();
+	b := resta (r.campo1, r.campo2);
+	
+	-- asignacion
+	i := 3 - 7;
+	distinto := 3/=4; -- distinto es variable lógica
+	cita1.usuario.edad := 30;
+	a := 2 - resta(2,2);
+	
+	-- sentencias IF	
+	if a/=b then
+		a:=a-1;
+	end if;
+	
+	if a/=b and x>y then
+		a:=a-1;
+		b:=b-1;
+	end if;
+	
+	if a/=b and (x>y and x>z) then
+	    a:=a-1;
+	    b:=b-1;
+	end if;
+
+	if esCierto then
+	   valor:=true;
+	else
+	   valor:=false;
+	end if;
+	
+	-- sentencias while	
+	while a>5 loop
+ 		a:=a-1;
+ 		Put_line (a);
+	end loop;
+	
+	-- sentencias ES	
+    Put_line ("CHONKYMONKEY");
+    Put_line (1);
+    Put_line (x);
+    Put_line (x-1);
+    Put_line (cita1.usuario.edad);
+    Put_line (True); 
+    Put_line (1>2);
+    Put_line ("Hola mundo");
+    Put_line (a,b);
+	
 
 end testCase01;

@@ -182,13 +182,18 @@ program ::=
 axiom          ::= cabecera cuerpo;
 
 cabecera       ::= PROCEDURE ID LEFTBRACKET RIGHTBRACKET IS
-			     | error {:syntaxErrorManager.syntaxInfo ("Error en la cabecera del programa"); errorCounter ++;:};
+                 | ID error {:syntaxErrorManager.syntaxInfo ("Falta 'procedure' en cabecera del programa"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET IS 
+				 | PROCEDURE error {:syntaxErrorManager.syntaxInfo ("Falta ID en cabecera del programa"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET IS 
+			     | PROCEDURE ID error {:syntaxErrorManager.syntaxInfo ("Falta '(' en cabecera del programa"); errorCounter ++;:} RIGHTBRACKET IS 
+				 | PROCEDURE ID LEFTBRACKET error {:syntaxErrorManager.syntaxInfo ("Falta ')' en cabecera del programa"); errorCounter ++;:} IS 
+				 | PROCEDURE ID LEFTBRACKET RIGHTBRACKET error {:syntaxErrorManager.syntaxInfo ("Falta 'is' en cabecera del programa"); errorCounter ++;:};
+			
 
 cuerpo         ::= declaracionesGlobales BEGIN sentencias END ID SEMICOLON
  		         | BEGIN sentencias END ID SEMICOLON
  		         | declaracionesGlobales BEGIN END ID SEMICOLON
- 		         | BEGIN END ID SEMICOLON;		         
-
+ 		         | BEGIN END ID SEMICOLON;        
+  //               | error {:syntaxErrorManager.syntaxInfo ("Error en la estructura del cuerpo del programa"); errorCounter ++;:};
 
 
 // Declaraciones --------------------------------------------------------------------------------------------------
@@ -203,8 +208,8 @@ declaracionesComunes   ::= tipos variables subprogramas
 		           		 | variables subprogramas           		 
 		           		 | tipos
 		           		 | variables
-		           		 | subprogramas
-		           		 | error {:syntaxErrorManager.syntaxInfo ("Estructura de declaraciones incorrecta"); errorCounter ++;:};     	
+		           		 | subprogramas;
+		       //    		 | error {:syntaxErrorManager.syntaxInfo ("Estructura de declaraciones incorrecta"); errorCounter ++;:};     	
 
 		           		 
 		           		  
@@ -325,7 +330,7 @@ subprograma			  ::= funcion | procedimiento;
 funcion               ::= FUNCTION ID LEFTBRACKET parametrosSubprograma RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
   					    | FUNCTION ID LEFTBRACKET RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
 					    | ID error {:syntaxErrorManager.syntaxInfo ("Falta 'function/procedure' en subprograma"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
-//					    | FUNCTION error {:syntaxErrorManager.syntaxInfo ("Falta ID en funcion"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
+					    | FUNCTION error {:syntaxErrorManager.syntaxInfo ("Falta ID en funcion"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
 					    | FUNCTION ID error {:syntaxErrorManager.syntaxInfo ("Falta '(' en funcion"); errorCounter ++;:} RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
 					    | FUNCTION ID LEFTBRACKET error {:syntaxErrorManager.syntaxInfo ("Falta ')' en funcion"); errorCounter ++;:} RETURN tipoPrimitivo IS cuerpoFuncion
 					    | FUNCTION ID LEFTBRACKET RIGHTBRACKET error {:syntaxErrorManager.syntaxInfo ("Falta 'return' en funcion"); errorCounter ++;:} tipoPrimitivo IS cuerpoFuncion
@@ -335,12 +340,13 @@ funcion               ::= FUNCTION ID LEFTBRACKET parametrosSubprograma RIGHTBRA
 cuerpoFuncion         ::= declaracionesComunes BEGIN sentencias RETURN expresion SEMICOLON END ID SEMICOLON
 	 		            | BEGIN sentencias RETURN expresion SEMICOLON END ID SEMICOLON
 	 		            | declaracionesComunes BEGIN RETURN expresion SEMICOLON END ID SEMICOLON
-	 		            | BEGIN RETURN expresion SEMICOLON END ID SEMICOLON;
+	 		            | BEGIN RETURN expresion SEMICOLON END ID SEMICOLON
+	 		            | error {:syntaxErrorManager.syntaxInfo ("Error en la estructura del cuerpo de una funcion"); errorCounter ++;:};			 
 	 		            
 					
 procedimiento         ::= PROCEDURE ID LEFTBRACKET parametrosSubprograma RIGHTBRACKET IS cuerpoProcedimiento
 				        | PROCEDURE ID LEFTBRACKET RIGHTBRACKET IS cuerpoProcedimiento
-	//			        | ID error {:syntaxErrorManager.syntaxInfo ("Falta 'procedure' en procedimiento"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET IS cuerpoProcedimiento
+				        | PROCEDURE error {:syntaxErrorManager.syntaxInfo ("Falta ID en procedimiento"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET IS cuerpoProcedimiento
 					    | PROCEDURE ID error {:syntaxErrorManager.syntaxInfo ("Falta '(' en procedimiento"); errorCounter ++;:} RIGHTBRACKET IS cuerpoProcedimiento
 					    | PROCEDURE ID LEFTBRACKET error {:syntaxErrorManager.syntaxInfo ("Falta ')' en procedimiento"); errorCounter ++;:} IS cuerpoProcedimiento
 					    | PROCEDURE ID LEFTBRACKET RIGHTBRACKET error {:syntaxErrorManager.syntaxInfo ("Falta 'is' en procedimiento"); errorCounter ++;:} cuerpoProcedimiento;
@@ -348,7 +354,8 @@ procedimiento         ::= PROCEDURE ID LEFTBRACKET parametrosSubprograma RIGHTBR
 cuerpoProcedimiento   ::= declaracionesComunes BEGIN sentencias END ID SEMICOLON
  		                | BEGIN sentencias END ID SEMICOLON
  		                | declaracionesComunes BEGIN END ID SEMICOLON
- 		                | BEGIN END ID SEMICOLON;				 
+ 		                | BEGIN END ID SEMICOLON	
+ 		                | error {:syntaxErrorManager.syntaxInfo ("Error en la estructura del cuerpo de un procedimiento"); errorCounter ++;:};			 
 			
 
 parametrosSubprograma ::= parametrosSubprograma parametroSubprograma 

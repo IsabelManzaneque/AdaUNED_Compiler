@@ -58,6 +58,11 @@ procedure testCase01 () is
 		y := resta(a, resta(b, c));
 		a:=x>y;
 	end suma;
+	
+	procedure devuelve () is  --DEBE GENERAR ERROR
+	begin
+		return 1;
+	end devuelve;
 		
 	-- funciones	
 	function uno() return Integer is

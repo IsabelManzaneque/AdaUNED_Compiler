@@ -116,6 +116,7 @@ non terminal sentenciaES;
 non terminal sentenciaAsign;
 non terminal sentenciaIf;
 non terminal sentenciaWhile;
+non terminal sentenciaReturn;
 non terminal sentenciaSubprograma;
 
 non terminal tipo;
@@ -152,7 +153,7 @@ precedence left     MULT;
 precedence left     ACCESS, LEFTBRACKET, RIGHTBRACKET; 
 
 
-// Declaración de reglas de produccion -------------------------------------------------------------------------
+// Declaración de reglas de produccion -----------------------------------------------------------------------
 
 
 start with program;
@@ -175,20 +176,18 @@ program ::=
 //                                                    //
 ////////////////////////////////////////////////////////
 
-// errores genericos 
 
 // Estructura del programa ----------------------------------------------------------------------------------------
 
 axiom          ::= cabecera cuerpo;
 
 cabecera       ::= PROCEDURE ID LEFTBRACKET RIGHTBRACKET IS
-                 | ID error {:syntaxErrorManager.syntaxInfo ("Falta 'procedure' en cabecera del programa"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET IS 
-				 | PROCEDURE error {:syntaxErrorManager.syntaxInfo ("Falta ID en cabecera del programa"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET IS 
-			     | PROCEDURE ID error {:syntaxErrorManager.syntaxInfo ("Falta '(' en cabecera del programa"); errorCounter ++;:} RIGHTBRACKET IS 
-				 | PROCEDURE ID LEFTBRACKET error {:syntaxErrorManager.syntaxInfo ("Falta ')' en cabecera del programa"); errorCounter ++;:} IS 
-				 | PROCEDURE ID LEFTBRACKET RIGHTBRACKET error {:syntaxErrorManager.syntaxInfo ("Falta 'is' en cabecera del programa"); errorCounter ++;:};
+                 | ID error {:syntaxErrorManager.syntaxFatalError("Falta 'procedure' en cabecera del programa"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET IS 
+				 | PROCEDURE error {:syntaxErrorManager.syntaxFatalError("Falta ID en cabecera del programa"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET IS 
+			     | PROCEDURE ID error {:syntaxErrorManager.syntaxFatalError("Falta '(' en cabecera del programa"); errorCounter ++;:} RIGHTBRACKET IS 
+				 | PROCEDURE ID LEFTBRACKET error {:syntaxErrorManager.syntaxFatalError("Falta ')' en cabecera del programa"); errorCounter ++;:} IS 
+				 | PROCEDURE ID LEFTBRACKET RIGHTBRACKET error {:syntaxErrorManager.syntaxFatalError("Falta 'is' en cabecera del programa"); errorCounter ++;:};
 			
-
 cuerpo         ::= declaracionesGlobales BEGIN sentencias END ID SEMICOLON
  		         | BEGIN sentencias END ID SEMICOLON
  		         | declaracionesGlobales BEGIN END ID SEMICOLON
@@ -200,7 +199,7 @@ cuerpo         ::= declaracionesGlobales BEGIN sentencias END ID SEMICOLON
 declaracionesGlobales  ::= constantesSimbolicas declaracionesComunes 
  				         | declaracionesComunes
  				         | constantesSimbolicas
- 				         | error {:syntaxErrorManager.syntaxInfo ("Estructura de declaraciones incorrecta"); errorCounter ++;:};
+ 				         | error {:syntaxErrorManager.syntaxFatalError("Estructura de declaraciones incorrecta"); errorCounter ++;:};
            				        		 
 declaracionesComunes   ::= tipos variables subprogramas
 		           		 | tipos variables
@@ -209,10 +208,10 @@ declaracionesComunes   ::= tipos variables subprogramas
 		           		 | tipos
 		           		 | variables
 		           		 | subprogramas
-		           		 | variables tipos {:syntaxErrorManager.syntaxInfo ("Estructura de declaraciones incorrecta"); errorCounter ++;:}
-		           		 | subprogramas tipos {:syntaxErrorManager.syntaxInfo ("Estructura de declaraciones incorrecta"); errorCounter ++;:}
-		           		 | subprogramas variables {:syntaxErrorManager.syntaxInfo ("Estructura de declaraciones incorrecta"); errorCounter ++;:}
-		           		 | tipos subprogramas variables {:syntaxErrorManager.syntaxInfo ("Estructura de declaraciones incorrecta"); errorCounter ++;:};
+		           		 | variables tipos {:syntaxErrorManager.syntaxFatalError("Estructura de declaraciones incorrecta"); errorCounter ++;:}
+		           		 | subprogramas tipos {:syntaxErrorManager.syntaxFatalError("Estructura de declaraciones incorrecta"); errorCounter ++;:}
+		           		 | subprogramas variables {:syntaxErrorManager.syntaxFatalError("Estructura de declaraciones incorrecta"); errorCounter ++;:}
+		           		 | tipos subprogramas variables {:syntaxErrorManager.syntaxFatalError("Estructura de declaraciones incorrecta"); errorCounter ++;:};
 		                      	
   		 		           		  
 
@@ -227,14 +226,14 @@ tipos              ::= tipos tipo | tipo;
 tipo               ::= tipoPrimitivo | tipoEstructurado;
 
 tipoEstructurado   ::= TYPE ID IS RECORD variables END RECORD SEMICOLON
-				     | ID error {:syntaxErrorManager.syntaxInfo ("Falta 'type' en tipo estructurado"); errorCounter ++;:} IS RECORD variables END RECORD SEMICOLON
-				     | TYPE error {:syntaxErrorManager.syntaxInfo ("Falta ID en tipo estructurado");errorCounter ++;:} IS RECORD variables END RECORD SEMICOLON
-				     | TYPE ID error {:syntaxErrorManager.syntaxInfo ("Falta 'is' en tipo estructurado");errorCounter ++;:} RECORD variables END RECORD SEMICOLON
-				     | TYPE ID IS error {:syntaxErrorManager.syntaxInfo ("Falta 'record' en tipo estructurado");errorCounter ++;:} variables END RECORD SEMICOLON
-				     | TYPE ID IS RECORD error {:syntaxErrorManager.syntaxInfo ("Falta cuerpo en tipo estructurado");errorCounter ++;:} END RECORD SEMICOLON
-				     | TYPE ID IS RECORD variables error {:syntaxErrorManager.syntaxInfo ("Falta 'end' en tipo estructurado");errorCounter ++;:} RECORD SEMICOLON
-				     | TYPE ID IS RECORD variables END error {:syntaxErrorManager.syntaxInfo ("Falta 'record' en tipo estructurado");errorCounter ++;:} SEMICOLON
-				     | TYPE ID IS RECORD variables END RECORD error {:syntaxErrorManager.syntaxInfo ("Falta ';' en tipo estructurado");errorCounter ++;:};
+				     | ID error {:syntaxErrorManager.syntaxFatalError("Falta 'type' en tipo estructurado"); errorCounter ++;:} IS RECORD variables END RECORD SEMICOLON
+				     | TYPE error {:syntaxErrorManager.syntaxFatalError("Falta ID en tipo estructurado");errorCounter ++;:} IS RECORD variables END RECORD SEMICOLON
+				     | TYPE ID error {:syntaxErrorManager.syntaxFatalError("Falta 'is' en tipo estructurado");errorCounter ++;:} RECORD variables END RECORD SEMICOLON
+				     | TYPE ID IS error {:syntaxErrorManager.syntaxFatalError("Falta 'record' en tipo estructurado");errorCounter ++;:} variables END RECORD SEMICOLON
+				     | TYPE ID IS RECORD error {:syntaxErrorManager.syntaxFatalError("Falta cuerpo en tipo estructurado");errorCounter ++;:} END RECORD SEMICOLON
+				     | TYPE ID IS RECORD variables error {:syntaxErrorManager.syntaxFatalError("Falta 'end' en tipo estructurado");errorCounter ++;:} RECORD SEMICOLON
+				     | TYPE ID IS RECORD variables END error {:syntaxErrorManager.syntaxFatalError("Falta 'record' en tipo estructurado");errorCounter ++;:} SEMICOLON
+				     | TYPE ID IS RECORD variables END RECORD error {:syntaxErrorManager.syntaxFatalError("Falta ';' en tipo estructurado");errorCounter ++;:};
 
 tipoPrimitivo      ::= INTEGER | BOOLEAN;
 
@@ -268,28 +267,31 @@ sentencia          ::= sentenciaES
                      | sentenciaAsign
                      | sentenciaIf
 				     | sentenciaWhile
+				     | sentenciaReturn
 				     | sentenciaSubprograma;
 
 sentenciaES        ::= PUT_LINE LEFTBRACKET parametro RIGHTBRACKET
-                     | LEFTBRACKET error {:syntaxErrorManager.syntaxInfo ("Falta 'Put_line' en sentencia E/S");errorCounter ++;:} parametro RIGHTBRACKET
-                     | PUT_LINE error {:syntaxErrorManager.syntaxInfo ("Falta '(' en sentencia E/S");errorCounter ++;:} parametro RIGHTBRACKET
-                     | PUT_LINE LEFTBRACKET parametro {:syntaxErrorManager.syntaxInfo ("Falta ')' en sentencia E/S");errorCounter ++;:};
+                     | LEFTBRACKET error {:syntaxErrorManager.syntaxFatalError("Falta 'Put_line' en sentencia E/S");errorCounter ++;:} parametro RIGHTBRACKET
+                     | PUT_LINE error {:syntaxErrorManager.syntaxFatalError("Falta '(' en sentencia E/S");errorCounter ++;:} parametro RIGHTBRACKET
+                     | PUT_LINE LEFTBRACKET parametro {:syntaxErrorManager.syntaxFatalError("Falta ')' en sentencia E/S");errorCounter ++;:};
 
 sentenciaAsign     ::= ID ACCESS sentenciaAsign | ID ASIGN expresion;
 
+sentenciaReturn    ::= RETURN expresion;
+
 sentenciaIf        ::= IF expresion THEN sentencias END IF 
                      | IF expresion THEN sentencias ELSE sentencias END IF
-                     | IF expresion error {:syntaxErrorManager.syntaxInfo ("sentencia if mal formada");errorCounter ++;:} sentencias END IF
-                     | IF expresion THEN sentencias error {:syntaxErrorManager.syntaxInfo ("Falta 'end' en sentencia if");errorCounter ++;:} IF;
+                     | IF expresion error {:syntaxErrorManager.syntaxFatalError("sentencia if mal formada");errorCounter ++;:} sentencias END IF
+                     | IF expresion THEN sentencias error {:syntaxErrorManager.syntaxFatalError("Falta 'end' en sentencia if");errorCounter ++;:} IF;
 
 sentenciaWhile     ::= WHILE expresion LOOP sentencias END LOOP
-                     | WHILE expresion error {:syntaxErrorManager.syntaxInfo ("Falta 'loop' en sentencia while");errorCounter ++;:} sentencias END LOOP
-                     | WHILE expresion LOOP sentencias error {:syntaxErrorManager.syntaxInfo ("Falta 'end' en sentencia while");errorCounter ++;:} LOOP
-                     | WHILE expresion LOOP sentencias END error{:syntaxErrorManager.syntaxInfo ("Falta 'loop' en sentencia while");errorCounter ++;:};
+                     | WHILE expresion error {:syntaxErrorManager.syntaxFatalError("Falta 'loop' en sentencia while");errorCounter ++;:} sentencias END LOOP
+                     | WHILE expresion LOOP sentencias error {:syntaxErrorManager.syntaxFatalError("Falta 'end' en sentencia while");errorCounter ++;:} LOOP
+                     | WHILE expresion LOOP sentencias END error{:syntaxErrorManager.syntaxFatalError("Falta 'loop' en sentencia while");errorCounter ++;:};
 
 sentenciaSubprograma ::= ID LEFTBRACKET parametro RIGHTBRACKET | ID LEFTBRACKET RIGHTBRACKET; 
 
-parametro          ::= expresion | STRING | error{:syntaxErrorManager.syntaxInfo ("Parametro no valido");:}; 
+parametro          ::= expresion | STRING | error{:syntaxErrorManager.syntaxFatalError("Parametro no valido");:}; 
 
 
 
@@ -298,12 +300,12 @@ parametro          ::= expresion | STRING | error{:syntaxErrorManager.syntaxInfo
 constantesSimbolicas ::= constantesSimbolicas constanteSimbolica | constanteSimbolica;
 
 constanteSimbolica   ::= ID COLON CONSTANT ASIGN tipoConstante SEMICOLON
-					   | COLON error {:syntaxErrorManager.syntaxInfo ("Falta ID en constante"); errorCounter ++;:} CONSTANT ASIGN tipoConstante SEMICOLON
-					   | ID error {:syntaxErrorManager.syntaxInfo ("Falta ':' en constante"); errorCounter ++;:} CONSTANT ASIGN tipoConstante SEMICOLON
-					   | ID COLON error {:syntaxErrorManager.syntaxInfo ("Falta 'constant' en constante"); errorCounter ++;:} ASIGN tipoConstante SEMICOLON
-					   | ID COLON CONSTANT error {:syntaxErrorManager.syntaxInfo ("Falta ':=' en constante"); errorCounter ++;:} tipoConstante SEMICOLON
-					   | ID COLON CONSTANT ASIGN error {:syntaxErrorManager.syntaxInfo ("Falta valor entero/logico en constante"); errorCounter ++;:} SEMICOLON
-					   | ID COLON CONSTANT ASIGN tipoConstante error {:syntaxErrorManager.syntaxInfo ("Falta ';' en constante"); errorCounter ++;:};					   
+					   | COLON error {:syntaxErrorManager.syntaxFatalError("Falta ID en constante"); errorCounter ++;:} CONSTANT ASIGN tipoConstante SEMICOLON
+					   | ID error {:syntaxErrorManager.syntaxFatalError("Falta ':' en constante"); errorCounter ++;:} CONSTANT ASIGN tipoConstante SEMICOLON
+					   | ID COLON error {:syntaxErrorManager.syntaxFatalError("Falta 'constant' en constante"); errorCounter ++;:} ASIGN tipoConstante SEMICOLON
+					   | ID COLON CONSTANT error {:syntaxErrorManager.syntaxFatalError("Falta ':=' en constante"); errorCounter ++;:} tipoConstante SEMICOLON
+					   | ID COLON CONSTANT ASIGN error {:syntaxErrorManager.syntaxFatalError("Falta valor entero/logico en constante"); errorCounter ++;:} SEMICOLON
+					   | ID COLON CONSTANT ASIGN tipoConstante error {:syntaxErrorManager.syntaxFatalError("Falta ';' en constante"); errorCounter ++;:};					   
 
 
 
@@ -313,10 +315,10 @@ constanteSimbolica   ::= ID COLON CONSTANT ASIGN tipoConstante SEMICOLON
 variables       ::= variables variable | variable; 
 
 variable        ::= ID COLON tipoVariable SEMICOLON | ID COMMA variable
-				  | COLON error {:syntaxErrorManager.syntaxInfo ("Falta ID en variable"); errorCounter ++;:} tipoVariable SEMICOLON
-                  | ID error {:syntaxErrorManager.syntaxInfo ("Falta ':' en variable"); errorCounter ++;:} tipoVariable SEMICOLON
-                  | ID COLON error {:syntaxErrorManager.syntaxInfo ("Falta tipo primitivo/id en variable"); errorCounter ++;:} SEMICOLON
-                  | ID COLON tipoVariable error {:syntaxErrorManager.syntaxInfo ("Falta ';' en variable"); errorCounter ++;:};
+				  | COLON error {:syntaxErrorManager.syntaxFatalError("Falta ID en variable"); errorCounter ++;:} tipoVariable SEMICOLON
+                  | ID error {:syntaxErrorManager.syntaxFatalError("Falta ':' en variable"); errorCounter ++;:} tipoVariable SEMICOLON
+                  | ID COLON error {:syntaxErrorManager.syntaxFatalError("Falta tipo primitivo/id en variable"); errorCounter ++;:} SEMICOLON
+                  | ID COLON tipoVariable error {:syntaxErrorManager.syntaxFatalError("Falta ';' en variable"); errorCounter ++;:};
                   
                   
 
@@ -329,43 +331,41 @@ subprograma			  ::= funcion | procedimiento;
 
 funcion               ::= FUNCTION ID LEFTBRACKET parametrosSubprograma RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
   					    | FUNCTION ID LEFTBRACKET RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
-					    | ID error {:syntaxErrorManager.syntaxInfo ("Falta 'function/procedure' en subprograma"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
-					    | FUNCTION error {:syntaxErrorManager.syntaxInfo ("Falta ID en funcion"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
-					    | FUNCTION ID error {:syntaxErrorManager.syntaxInfo ("Falta '(' en funcion"); errorCounter ++;:} RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
-					    | FUNCTION ID LEFTBRACKET error {:syntaxErrorManager.syntaxInfo ("Falta ')' en funcion"); errorCounter ++;:} RETURN tipoPrimitivo IS cuerpoFuncion
-					    | FUNCTION ID LEFTBRACKET RIGHTBRACKET error {:syntaxErrorManager.syntaxInfo ("Falta 'return' en funcion"); errorCounter ++;:} tipoPrimitivo IS cuerpoFuncion
-					    | FUNCTION ID LEFTBRACKET RIGHTBRACKET RETURN error {:syntaxErrorManager.syntaxInfo ("Falta tipo primitivo en funcion"); errorCounter ++;:} IS cuerpoFuncion
-					    | FUNCTION ID LEFTBRACKET RIGHTBRACKET RETURN tipoPrimitivo error {:syntaxErrorManager.syntaxInfo ("Falta 'is' en funcion"); errorCounter ++;:} cuerpoFuncion;
-				  
-cuerpoFuncion         ::= declaracionesComunes BEGIN sentencias RETURN expresion SEMICOLON END ID SEMICOLON
-	 		            | BEGIN sentencias RETURN expresion SEMICOLON END ID SEMICOLON
-	 		            | declaracionesComunes BEGIN RETURN expresion SEMICOLON END ID SEMICOLON
-	 		            | BEGIN RETURN expresion SEMICOLON END ID SEMICOLON
-	 		            | error {:syntaxErrorManager.syntaxInfo ("Error en la estructura del cuerpo de una funcion"); errorCounter ++;:};			 
-	 		            
-					
+					    | ID error {:syntaxErrorManager.syntaxFatalError("Falta 'function/procedure' en subprograma"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
+					    | FUNCTION error {:syntaxErrorManager.syntaxFatalError("Falta ID en funcion"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
+					    | FUNCTION ID error {:syntaxErrorManager.syntaxFatalError("Falta '(' en funcion"); errorCounter ++;:} RIGHTBRACKET RETURN tipoPrimitivo IS cuerpoFuncion
+					    | FUNCTION ID LEFTBRACKET error {:syntaxErrorManager.syntaxFatalError("Falta ')' en funcion"); errorCounter ++;:} RETURN tipoPrimitivo IS cuerpoFuncion
+					    | FUNCTION ID LEFTBRACKET RIGHTBRACKET error {:syntaxErrorManager.syntaxFatalError("Falta 'return' en funcion"); errorCounter ++;:} tipoPrimitivo IS cuerpoFuncion
+					    | FUNCTION ID LEFTBRACKET RIGHTBRACKET RETURN error {:syntaxErrorManager.syntaxFatalError("Falta tipo primitivo en funcion"); errorCounter ++;:} IS cuerpoFuncion
+					    | FUNCTION ID LEFTBRACKET RIGHTBRACKET RETURN tipoPrimitivo error {:syntaxErrorManager.syntaxFatalError("Falta 'is' en funcion"); errorCounter ++;:} cuerpoFuncion;
+
+cuerpoFuncion         ::= declaracionesComunes BEGIN sentencias END ID SEMICOLON
+	 		            | BEGIN sentencias END ID SEMICOLON
+	 		            | error {:syntaxErrorManager.syntaxFatalError("Error en la estructura del cuerpo de una funcion"); errorCounter ++;:};			 
+	
+ 		            					
 procedimiento         ::= PROCEDURE ID LEFTBRACKET parametrosSubprograma RIGHTBRACKET IS cuerpoProcedimiento
 				        | PROCEDURE ID LEFTBRACKET RIGHTBRACKET IS cuerpoProcedimiento
-				        | PROCEDURE error {:syntaxErrorManager.syntaxInfo ("Falta ID en procedimiento"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET IS cuerpoProcedimiento
-					    | PROCEDURE ID error {:syntaxErrorManager.syntaxInfo ("Falta '(' en procedimiento"); errorCounter ++;:} RIGHTBRACKET IS cuerpoProcedimiento
-					    | PROCEDURE ID LEFTBRACKET error {:syntaxErrorManager.syntaxInfo ("Falta ')' en procedimiento"); errorCounter ++;:} IS cuerpoProcedimiento
-					    | PROCEDURE ID LEFTBRACKET RIGHTBRACKET error {:syntaxErrorManager.syntaxInfo ("Falta 'is' en procedimiento"); errorCounter ++;:} cuerpoProcedimiento;
+				        | PROCEDURE error {:syntaxErrorManager.syntaxFatalError("Falta ID en procedimiento"); errorCounter ++;:} LEFTBRACKET RIGHTBRACKET IS cuerpoProcedimiento
+					    | PROCEDURE ID error {:syntaxErrorManager.syntaxFatalError("Falta '(' en procedimiento"); errorCounter ++;:} RIGHTBRACKET IS cuerpoProcedimiento
+					    | PROCEDURE ID LEFTBRACKET error {:syntaxErrorManager.syntaxFatalError("Falta ')' en procedimiento"); errorCounter ++;:} IS cuerpoProcedimiento
+					    | PROCEDURE ID LEFTBRACKET RIGHTBRACKET error {:syntaxErrorManager.syntaxFatalError("Falta 'is' en procedimiento"); errorCounter ++;:} cuerpoProcedimiento;
 				 
 cuerpoProcedimiento   ::= declaracionesComunes BEGIN sentencias END ID SEMICOLON
  		                | BEGIN sentencias END ID SEMICOLON
  		                | declaracionesComunes BEGIN END ID SEMICOLON
  		                | BEGIN END ID SEMICOLON	
- 		                | error {:syntaxErrorManager.syntaxInfo ("Error en la estructura del cuerpo de un procedimiento"); errorCounter ++;:};			 
+ 		                | error {:syntaxErrorManager.syntaxFatalError("Error en la estructura del cuerpo de un procedimiento"); errorCounter ++;:};			 
 			
-
 parametrosSubprograma ::= parametrosSubprograma parametroSubprograma 
 					    | parametrosSubprograma SEMICOLON parametroSubprograma
 						| parametroSubprograma;
 
-parametroSubprograma   ::= ID COLON OUT tipo 
-                         | ID COLON tipo 
-                         | ID COMMA parametroSubprograma
-                         | error {:syntaxErrorManager.syntaxInfo ("Error en parametros de subprograma"); errorCounter ++;:};
+parametroSubprograma  ::= ID COLON OUT tipo 
+                        | ID COLON tipo 
+                        | ID COMMA parametroSubprograma
+                        | error {:syntaxErrorManager.syntaxFatalError("Error en parametros de subprograma"); errorCounter ++;:};
+
 
 
 	

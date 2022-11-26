@@ -34,18 +34,17 @@ import es.uned.lsi.compiler.lexical.LexicalErrorManager;
 %}  
   
 
-ESPACIO_BLANCO=[ \t\r\n\f]
-fin = "fin"{ESPACIO_BLANCO}
-
-LETTER      = [a-zA-Z]
-ESP_CHAR    = [£$?!&%@αινσϊρη]
-STRING      = \".*\"                         
-DIGIT       = [0-9]
-INT         = {DIGIT}+                          
-ID          = ({LETTER}({LETTER}|{DIGIT})*)                                       
-WRONG_ID    = (({INT}|{ESP_CHAR})+({ID}|{INT}|{ESP_CHAR})*) | ({ID}{ESP_CHAR}+({ID}|{INT}|{ESP_CHAR})*)        
-SALTO_LINEA =[\r\n]
-COMMENT     = "--" ~{SALTO_LINEA}               
+ESPACIO_BLANCO =   [ \t\r\n\f]
+fin            =   "fin"{ESPACIO_BLANCO}
+LETTER         =   [a-zA-Z]
+ESP_CHAR       =   [£$?!&%@αινσϊρη]
+STRING         =   \".*\"                         
+DIGIT          =   [0-9]
+INT            =   {DIGIT}+                          
+ID             =   ({LETTER}({LETTER}|{DIGIT})*)                                       
+WRONG_ID       =   (({INT}|{ESP_CHAR})+({ID}|{INT}|{ESP_CHAR})*) | ({ID}{ESP_CHAR}+({ID}|{INT}|{ESP_CHAR})*)        
+SALTO_LINEA    =   [\r\n]
+COMMENT        =   "--" ~{SALTO_LINEA}               
 
 
 %%
@@ -53,7 +52,7 @@ COMMENT     = "--" ~{SALTO_LINEA}
 <YYINITIAL> 
 {
 
-     // DELIMITADORES
+     // DELIMITADORES ------------------------------------------------------
      
      "“"                {  
                            Token token = new Token (sym.DOUBLEQ);   
@@ -110,10 +109,9 @@ COMMENT     = "--" ~{SALTO_LINEA}
                            token.setLexema (yytext ());          
            			       return token;                         
                         }
+                        
                        
-     // OPERADORES ARITMETICOS
-     
-   
+     // OPERADORES ARITMETICOS --------------------------------------------     
     
      "-"                {  
                            Token token = new Token (sym.MINUS);
@@ -165,7 +163,7 @@ COMMENT     = "--" ~{SALTO_LINEA}
            			       return token;
                         }
                         
-      // PALABRAS RESERVADAS	
+      // PALABRAS RESERVADAS ----------------------------------------------	
       
      
      "and"              { 
@@ -336,10 +334,9 @@ COMMENT     = "--" ~{SALTO_LINEA}
            			       return token;
 			            }  
 			           
-      // PATRONES      
-                        
+     
+      // PATRONES ---------------------------------------------------------                         
     
-      // incluir aqui el resto de las reglas patron - accion
  	 
      {ID}               {  
 	                       Token token = new Token (sym.ID);
@@ -371,7 +368,7 @@ COMMENT     = "--" ~{SALTO_LINEA}
                            error.setLine (yyline + 1);
 	                       error.setColumn (yycolumn + 1);
 	                       error.setLexema (yytext ());
-	                       lexicalErrorManager.lexicalError ("Error en la linea " + error.getLine() + ", columna " + error.getColumn() +", Identificador no valido: " + yytext());	                       
+	                       lexicalErrorManager.lexicalFatalError("Error en la linea " + error.getLine() + ", columna " + error.getColumn() +", Identificador no valido: " + yytext());	                       
 	                    }
      
      {COMMENT}          {}		   
@@ -389,7 +386,7 @@ COMMENT     = "--" ~{SALTO_LINEA}
                            error.setLine (yyline + 1);
                            error.setColumn (yycolumn + 1);
                            error.setLexema (yytext ());               
-                           lexicalErrorManager.lexicalError("Error en la linea " + error.getLine() + ", columna " + error.getColumn() + ", Caracter no esperado: " + error.getLexema());
+                           lexicalErrorManager.lexicalFatalError("Error en la linea " + error.getLine() + ", columna " + error.getColumn() + ", Caracter no esperado: " + error.getLexema());
                                 
                         }
      	

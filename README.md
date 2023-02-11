@@ -126,6 +126,156 @@ La sintaxis para su declaración es la siguiente:
 
 **nombre: constant := valor;**
 
+Ejemplos de constantes:
+<pre>
+CIERTO: constant := True;
+FALSO: constant := False;
+</pre>
+### Declaración de tipos
+
+#### Tipos primitivos
+
+Se encuentran disponibles directamente para que el programador tipifique las variables de su programa
+
+• Tipo entero (Integer): Representa valores enteros positivos y negativos. Se representa con la palabra reservada Integer. 
+<pre>
+  x : Integer;
+</pre>
+• Tipo Lógico (Boolean): El tipo lógico representa valores de verdad, representados por las constantes literales True y False. 
+  Para referirse a este tipo de datos se utiliza la palabra reservada Boolean.
+<pre>
+  esMayor : Boolean; 
+</pre>
+#### Tipos estructurados
+permiten al programador definir estructuras de datos complejas y establecerlas como un tipo del lenguaje
+
+• Tipo Registro (Record): Permite agrupar varios elementos de distinto tipo.
+<pre>
+type nombre is record
+    nombreCampo1: TipoCampo1;
+    nombreCampo2: TipoCampo2;
+    ...
+end record;
+
+type Tpersona is record
+    dni: Integer;
+    edad : Integer;
+    casado : Boolean;
+end record;
+</pre>
+
+### Declaraciones de variables
+
+Es necesario declarar las variables antes de utilizarlas. Se utiliza la siguiente sintaxis, dentro de las áreas de declaración de variables:
+
+**nombre1, nombre2 : tipo;**
+<pre>
+x,y : Integer;
+a : Boolean;
+p1,p2: Tpersona;
+</pre>
+
+
+### Declaraciones de subprogramas
+
+Un subprograma es una secuencia de instrucciones encapsuladas bajo un nombre con un conjunto de parámetros (opcionalmente ninguno) y, en el caso de
+funciones, un valor de retorno. Los procedimientos no devuelven ningún valor. 
+
+#### Funciones
+Sintáxis de la declaración de funciones:
+<pre>
+function nombre (param1, param11…:tipo1; para2, param21…:tipo2)
+return tipoRetorno is
+    -- Declaración de tipos locales
+    -- Declaración de variables
+    -- Declaración de subprogramas anidados
+begin
+    -- Bloque de sentencias. Debe incluir la sentencia return
+end nombre;
+</pre>
+
+Ejemplo de declaración de una función:
+<pre>
+function suma (x, y: Integer) return Integer is
+    z: Integer;
+begin
+    z:= x+y;
+    return z;
+end suma;
+</pre>
+
+#### Procedimientos
+Similares a las funciones pero no devuelven ningún valor, por lo que no contienen la sentencia return:
+<pre>
+procedure nombre (param1,param11…:tipo1;para2,param21…:tipo2) is
+    -- Declaración de tipos locales
+    -- Declaración de variables
+    -- Declaración de subprogramas anidados
+begin
+    -- Bloque de sentencias
+end nombre;
+</pre>
+
+Ejemplo de declaración de un procedimiento:
+<pre>
+procedure resta (x, y, z: out Integer) is
+    -- parametros pasados por referencia
+begin
+    z:= x-y;
+end resta;
+</pre>
+
+### Paso de parámetros
+
+El paso de parámetros a un subprograma puede ser por valor o por referencia. En el paso por valor, el compilador realiza una copia del argumento a 
+otra zona de memoria para que el subprograma pueda trabajar con él sin modificar el valor del argumento tras la ejecución de la invocación. En el 
+paso por referencia, el parámetro es una referencia y el compilador transmite al subprograma la dirección de memoria donde está almacenado el parámetro 
+actual, de forma que las modificaciones al parámetro tendrán efecto sobre el argumento una vez terminada la ejecución.  Para indicar que un parámetro 
+se pasa por referencia debe precederse su tipo con la palabra reservada out. 
+
+<pre>
+-- Paso por valor
+function resta (a,b:Integer) return Integer is
+begin
+    z:= x-y;
+return z;
+end resta;
+
+-- Paso por referencia
+procedure mayor (x, y: out Integer; a: out Boolean) is
+begin
+    a:=x>y
+end mayor;
+</pre>
+
+### Expresiones
+
+Construcción del lenguaje que devuelve un valor de retorno. Las expresiones no deben aparecer de forma aislada en el código, 
+han de estar incluidas como parte de una sentencia.
+
+• Expresiones	aritméticas: Devuelve un valor de tipo entero al contexto de evaluación.
+
+• Expresiones lógicas: Devuelve un valor de tipo lógico al contexto de evaluación.
+
+• Expresiones	de	acceso	a	campos	de	registros: Para acceder a los campos de un registro se utiliza el operador de acceso a registro “.”
+
+• Invocación	de	funciones: Para llamar a un subprograma ha de escribirse su identificador indicando entre paréntesis los parámetros actuales de la llamada.
+
+#### Precedencia	y	asociatividad	de	operadores
+En la siguiente tabla la prioridad decrece por filas. Los operadores en la misma fila tienen igual precedencia:
+
+<pre>
+Precedencia    Asociatividad
+
+. ( )            Izquierda
+*                Izquierda
+-                Izquierda
+>                Izquierda
+/=               Izquierda
+and              Izquierda
+</pre>
+
+### Sentencias
 
 ## Tecnologías
 

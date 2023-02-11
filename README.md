@@ -277,6 +277,57 @@ and              Izquierda
 
 ### Sentencias
 
+Las sentencias se escriben dentro del cuerpo de los subprogramas (o procedimiento principal) declarados en el mismo. Tras la declaración de tipos,
+variables y subprogramas anidados, comienza una secuencia de sentencias que constituyen el código. 
+
+• Sentencias	de	asignación:
+
+Sirven para asignar un valor a una variable o campo de un registro. Se escribe primero una referencia a algun elementos seguido del
+operador de asignación “:=” y a su derecha una expresión. El operador de asignación no es asociativo, no es posible escribir construcciones 
+del estilo a := b := c. 
+<pre>
+ref := expresion;
+</pre>
+
+• Sentencia	de control if – then	– else:
+
+Permite alterar el flujo normal de ejecución de un programa en según el resultado de una expresión lógica
+<pre>
+if expresiónLogica then
+    -- sentencias1
+else
+    -- sentencias2
+end if;
+</pre>
+
+• Sentencia	de	control	while:
+
+Se utiliza para realizar iteraciones sobre un bloque de sentencias mientras se cumpla una determinada condición.  
+<pre>
+while expresionLogica loop
+    -- sentencias
+end loop;
+</pre>
+
+• Sentencias	de	Entrada/Salida:
+
+Se dispone de un procedimiento predefinido que puede ser utilizado para emitir mensajes por la salida estándar:
+<pre>
+Put_line(parametro);
+</pre>
+Put_line es la palabra reservada para invocar la sentencia de salida. Sólo puede admitir un parámetro que podrá ser una expresión numérica, 
+lógica o una cadena de caracteres.
+
+### Gestión de errores
+
+• Errores léxicos: Algunos errores de naturaleza léxica no puedan ser detectados a este nivel y deben ser postergados al análisis 
+  sintáctico. Son ejemplos de errores léxicos: literal mal construido, identificador mal construido, carácter no admitido, etc.
+  
+• Errores sintácticos: todo tipo de construcción sintáctica que no se ajuste a las especificaciones gramaticales del lenguaje constituye un error sintáctico.
+
+No se realiza una recuperación de errores. Si el compilador encuentra un carácter extraño en el código fuente, emitirá un mensaje de error y abortará el
+proceso de compilación. Del mismo modo, si se encuentra una construcción incorrecta desde el punto de vista sintáctico, se aborta la compilación.
+
 ## Tecnologías
 
 * IDE: Eclipse 2021 – 03
